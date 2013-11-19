@@ -10,13 +10,15 @@
  * @property string $type
  * @property string $visibility
  * @property array $options
- * @method Bronto_Api_Field_Row delete() delete()
- * @method Bronto_Api_Field getApiObject() getApiObject()
+ * @method \Bronto\Api\Field\Row delete() delete()
+ * @method \Bronto\Api\Field getApiObject() getApiObject()
  */
-class Bronto_Api_Field_Row extends Bronto_Api_Row
+namespace Bronto\Api\Field;
+
+class Row extends \Bronto\Api\Row
 {
     /**
-     * @return Bronto_Api_Field_Row
+     * @return Row
      */
     public function read()
     {
@@ -38,7 +40,7 @@ class Bronto_Api_Field_Row extends Bronto_Api_Row
     /**
      * @param bool $upsert
      * @param bool $refresh
-     * @return Bronto_Api_Field_Row
+     * @return Row
      */
     public function save($upsert = true, $refresh = false)
     {
@@ -48,8 +50,8 @@ class Bronto_Api_Field_Row extends Bronto_Api_Row
 
         try {
             parent::_save(true, $refresh);
-        } catch (Bronto_Api_Field_Exception $e) {
-            if ($e->getCode() === Bronto_Api_Field_Exception::ALREADY_EXISTS) {
+        } catch (Exception $e) {
+            if ($e->getCode() === Exception::ALREADY_EXISTS) {
                 $this->_refresh();
             } else {
                 $e->appendToMessage("(Name: {$this->name})");

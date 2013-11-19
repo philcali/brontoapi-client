@@ -8,13 +8,15 @@
  * @property-read string $id
  * @property string $name
  * @property string value
- * @method Bronto_Api_ContentTag_Row delete() delete()
- * @method Bronto_Api_ContentTag getApiObject() getApiObject()
+ * @method \Bronto\Api\ContentTag\Row delete() delete()
+ * @method \Bronto\Api\ContentTag getApiObject() getApiObject()
  */
-class Bronto_Api_ContentTag_Row extends Bronto_Api_Row
+namespace Bronto\Api\ContentTag;
+
+class Row extends \Bronto\Api\Row
 {
     /**
-     * @return Bronto_Api_ContentTag_Row
+     * @return Row
      */
     public function read()
     {
@@ -36,7 +38,7 @@ class Bronto_Api_ContentTag_Row extends Bronto_Api_Row
     /**
      * @param bool $upsert
      * @param bool $refresh
-     * @return Bronto_Api_ContentTag_Row
+     * @return Row
      */
     public function save($upsert = true, $refresh = false)
     {
@@ -46,8 +48,8 @@ class Bronto_Api_ContentTag_Row extends Bronto_Api_Row
 
         try {
             parent::_save(true, $refresh);
-        } catch (Bronto_Api_ContentTag_Exception $e) {
-            if ($e->getCode() === Bronto_Api_ContentTag_Exception::MESSAGE_EXISTS) {
+        } catch (Exception $e) {
+            if ($e->getCode() === Exception::MESSAGE_EXISTS) {
                 $this->_refresh();
             } else {
                 $this->getApi()->throwException($e);

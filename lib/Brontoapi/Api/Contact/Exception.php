@@ -3,7 +3,9 @@
  * @copyright  2011-2013 Bronto Software, Inc.
  * @license http://opensource.org/licenses/OSL-3.0 Open Software License v. 3.0 (OSL-3.0)
  */
-class Bronto_Api_Contact_Exception extends Bronto_Api_Exception
+namespace Bronto\Api\Contact;
+
+class Exception extends \Bronto\Api\Exception
 {
     const INVALID_REQUEST              = 301; // Invalid request:
     const NOT_FOUND                    = 302; // Contact does not exist.

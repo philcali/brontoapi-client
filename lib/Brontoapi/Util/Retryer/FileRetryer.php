@@ -6,7 +6,9 @@
  * @license http://opensource.org/licenses/OSL-3.0 Open Software License v. 3.0 (OSL-3.0)
  * 
  */
-class Bronto_Util_Retryer_FileRetryer implements Bronto_Util_Retryer_RetryerInterface
+namespace Bronto\Util\Retryer;
+
+class FileRetryer implements RetryerInterface
 {
     /**
      * @var string
@@ -42,17 +44,19 @@ class Bronto_Util_Retryer_FileRetryer implements Bronto_Util_Retryer_RetryerInte
     }
 
     /**
-     * @param Bronto_Api_Object $object
-     * @param int $attempts
-     * @return string
+     * @param \Bronto\Api\Object $object
+     * @param int                $attempts
+     *
+     * @return bool|mixed|string
+     * @throws RetryerException
      */
-    public function store(Bronto_Api_Object $object, $attempts = 0)
+    public function store(\Bronto\Api\Object $object, $attempts = 0)
     {
         if (!@is_dir($this->_path) && !@mkdir($this->_path, 0777, true)) {
-            throw new Bronto_Util_RetryerException(sprintf('The Retryer path is not a directory: %s', $this->_path));
+            throw new RetryerException(sprintf('The Retryer path is not a directory: %s', $this->_path));
         } else {
             if (!@is_writable($this->_path)) {
-                throw new Bronto_Util_RetryerException(sprintf('The Retryer path is not a writable: %s', $this->_path));
+                throw new RetryerException(sprintf('The Retryer path is not a writable: %s', $this->_path));
             }
         }
 
@@ -73,13 +77,15 @@ class Bronto_Util_Retryer_FileRetryer implements Bronto_Util_Retryer_RetryerInte
     }
 
     /**
-     * @param string $filePath
-     * @return Bronto_Api_Object
+     * @param $filePath
+     *
+     * @return array
+     * @throws RetryerException
      */
     protected function _loadObject($filePath)
     {
         if (!@file_exists($filePath)) {
-            throw new Bronto_Util_RetryerException(sprintf('Failed to retry file path: %s', $filePath));
+            throw new RetryerException(sprintf('Failed to retry file path: %s', $filePath));
         }
 
         $parts = explode('_', $filePath);
@@ -93,7 +99,7 @@ class Bronto_Util_Retryer_FileRetryer implements Bronto_Util_Retryer_RetryerInte
 
     /**
      * @param string $filePath
-     * @return Bronto_Api_Rowset
+     * @return \Bronto\Api\Rowset
      */
     public function attempt($filePath)
     {

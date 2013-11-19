@@ -1,13 +1,15 @@
 <?php
 
 /**
- * @author Chris Jones <chris.jones@bronto.com>
+ * @author     Chris Jones <chris.jones@bronto.com>
  * @copyright  2011-2013 Bronto Software, Inc.
- * @license http://opensource.org/licenses/OSL-3.0 Open Software License v. 3.0 (OSL-3.0)
- * 
- * @link http://community.bronto.com/api/v4/objects/general/activityobject
+ * @license    http://opensource.org/licenses/OSL-3.0 Open Software License v. 3.0 (OSL-3.0)
+ *
+ * @link       http://community.bronto.com/api/v4/objects/general/activityobject
  */
-class Bronto_Api_Activity extends Bronto_Api_Object
+namespace Bronto\Api;
+
+class Activity extends Object
 {
     /** trackingType */
     const TYPE_OPEN        = 'open';
@@ -38,7 +40,7 @@ class Bronto_Api_Activity extends Bronto_Api_Object
      * @var array
      */
     protected $_options = array(
-        'trackingType' => array(
+        'trackingType'  => array(
             self::TYPE_OPEN,
             self::TYPE_CLICK,
             self::TYPE_CONVERSION,
@@ -51,7 +53,7 @@ class Bronto_Api_Activity extends Bronto_Api_Object
             self::DIRECTION_FIRST,
             self::DIRECTION_NEXT,
         ),
-        'bounceType' => array(
+        'bounceType'    => array(
             self::BOUNCE_HARD_CONN_PERM,
             self::BOUNCE_HARD_SUB_PERM,
             self::BOUNCE_HARD_CONTENT_PERM,
@@ -72,7 +74,7 @@ class Bronto_Api_Activity extends Bronto_Api_Object
     /**
      * @var int
      */
-    protected $_iteratorType = Bronto_Api_Rowset_Iterator::TYPE_STREAM;
+    protected $_iteratorType = Rowset\Iterator::TYPE_STREAM;
 
     /**
      * The key(s) to use when paginating
@@ -98,12 +100,13 @@ class Bronto_Api_Activity extends Bronto_Api_Object
     );
 
     /**
-     * @param string $startDate
-     * @param int $size
+     * @param string       $startDate
+     * @param int          $size
      * @param string|array $types
-     * @param string $direction
+     * @param string       $direction
      * @param string|array $contactIds
-     * @return Bronto_Api_Rowset
+     *
+     * @return Rowset
      */
     public function readAll($startDate = '2002-01-01T00:00:00+00:00', $size = 1000, $types = array(), $direction = self::DIRECTION_FIRST, $contactIds = array())
     {
@@ -120,7 +123,7 @@ class Bronto_Api_Activity extends Bronto_Api_Object
         }
 
         if (!empty($size)) {
-            $filter['size'] = $size < 1000 ? 1000 : (int) $size;
+            $filter['size'] = $size < 1000 ? 1000 : (int)$size;
         }
 
         if (!empty($types)) {
@@ -152,18 +155,23 @@ class Bronto_Api_Activity extends Bronto_Api_Object
 
     /**
      * @param array $data
+     *
+     * @return Row|void
+     * @throws Activity\Exception
      */
     public function createRow(array $data = array())
     {
-        throw new Bronto_Api_Activity_Exception('You cannot create an Activity row.');
+        throw new Activity\Exception('You cannot create an Activity row.');
     }
 
     /**
-     * @param string $type
-     * @param string $index
-     * @param Bronto_Api_Row $object
+     * @param     $type
+     * @param     $index
+     * @param Row $object
+     *
+     * @return $this
      */
-    public function addToCache($type, $index, Bronto_Api_Row $object)
+    public function addToCache($type, $index, Row $object)
     {
         // Conserve memory
         while (count($this->_objectCache[$type]) >= 25) {
@@ -171,24 +179,28 @@ class Bronto_Api_Activity extends Bronto_Api_Object
         }
 
         $this->_objectCache[$type][$index] = $object;
+
         return $this;
     }
 
     /**
      * @param string $type
      * @param string $index
-     * @return bool|Bronto_Api_Row
+     *
+     * @return bool|Row
      */
     public function getFromCache($type, $index)
     {
         if (isset($this->_objectCache[$type][$index])) {
             return $this->_objectCache[$type][$index];
         }
+
         return false;
     }
 
     /**
      * @param string $bounceType
+     *
      * @return bool
      */
     public function isBounceHard($bounceType)
@@ -202,6 +214,7 @@ class Bronto_Api_Activity extends Bronto_Api_Object
 
     /**
      * @param string $bounceType
+     *
      * @return bool
      */
     public function isBounceSoft($bounceType)

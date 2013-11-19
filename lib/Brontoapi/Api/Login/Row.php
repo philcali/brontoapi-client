@@ -22,18 +22,20 @@
  * @property bool $permissionFieldReorder
  * @property bool $permissionSubscriberCreate
  * @property bool $permissionSubscriberView
- * @method Bronto_Api_Login_Row read() read()
- * @method Bronto_Api_Login_Row save() save()
- * @method Bronto_Api_Login_Row delete() delete()
- * @method Bronto_Api_Login getApiObject() getApiObject()
+ * @method \Bronto\Api\Login\Row read() read()
+ * @method \Bronto\Api\Login\Row save() save()
+ * @method \Bronto\Api\Login\Row delete() delete()
+ * @method \Bronto\Api\Login getApiObject() getApiObject()
  */
-class Bronto_Api_Login_Row extends Bronto_Api_Row
+namespace Bronto\Api\Login;
+
+class Row extends \Bronto\Api\Row
 {
     /**
-     * @return Bronto_Api_Login_ContactInformation
+     * @return ContactInformation
      */
     public function getContactInformation()
     {
-        return new Bronto_Api_Login_ContactInformation($this->contactInformation);
+        return new ContactInformation($this->contactInformation);
     }
 }

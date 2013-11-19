@@ -1,13 +1,15 @@
 <?php
 
 /**
- * @author Chris Jones <chris.jones@bronto.com>
+ * @author     Chris Jones <chris.jones@bronto.com>
  * @copyright  2011-2013 Bronto Software, Inc.
- * @license http://opensource.org/licenses/OSL-3.0 Open Software License v. 3.0 (OSL-3.0)
- * 
- * @link http://community.bronto.com/api/v4/objects/general/contactinformation
+ * @license    http://opensource.org/licenses/OSL-3.0 Open Software License v. 3.0 (OSL-3.0)
+ *
+ * @link       http://community.bronto.com/api/v4/objects/general/contactinformation
  */
-class Bronto_Api_Login_ContactInformation
+namespace Bronto\Api\Login;
+
+class ContactInformation
 {
     /**
      * @var string
@@ -70,11 +72,11 @@ class Bronto_Api_Login_ContactInformation
     public $notes;
 
     /**
-     * @param stdClass $data
+     * @param array $data
      */
     public function __construct($data = array())
     {
-        $data = (array) $data;
+        $data = (array)$data;
         foreach ($data as $key => $value) {
             if (property_exists($this, $key)) {
                 $this->{$key} = $value;
@@ -83,11 +85,13 @@ class Bronto_Api_Login_ContactInformation
     }
 
     /**
-     * @param string $name
-     * @param mixed $value
+     * @param $name
+     * @param $value
+     *
+     * @throws \InvalidArgumentException
      */
     public function __set($name, $value)
     {
-        throw new InvalidArgumentException('All properties of the ContactInformation are read-only (currently)');
+        throw new \InvalidArgumentException('All properties of the ContactInformation are read-only (currently)');
     }
 }

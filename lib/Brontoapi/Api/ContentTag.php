@@ -1,15 +1,17 @@
 <?php
 
 /**
- * @author Jeremy Bobbitt <jeremy.bobbitt@bronto.com>
+ * @author     Jeremy Bobbitt <jeremy.bobbitt@bronto.com>
  * @copyright  2011-2013 Bronto Software, Inc.
- * @license http://opensource.org/licenses/OSL-3.0 Open Software License v. 3.0 (OSL-3.0)
- * 
- * @link http://community.bronto.com/api/v4/objects/general/contenttagobject
+ * @license    http://opensource.org/licenses/OSL-3.0 Open Software License v. 3.0 (OSL-3.0)
  *
- * @method Bronto_Api_ContentTag_Row createRow() createRow(array $data = array())
+ * @link       http://community.bronto.com/api/v4/objects/general/contenttagobject
+ *
+ * @method \Bronto\Api\ContentTag\Row createRow() createRow(array $data = array())
  */
-class Bronto_Api_ContentTag extends Bronto_Api_Object
+namespace Bronto\Api;
+
+class ContentTag extends Object
 {
     /**
      * The object name.
@@ -22,24 +24,26 @@ class Bronto_Api_ContentTag extends Bronto_Api_Object
      * @var array
      */
     protected $_methods = array(
-        'addContentTags'           => 'add',
-        'readContentTags'          => 'read',
-        'updateContentTags'        => 'update',
-        'deleteContentTags'        => 'delete'
+        'addContentTags'    => 'add',
+        'readContentTags'   => 'read',
+        'updateContentTags' => 'update',
+        'deleteContentTags' => 'delete'
     );
 
     /**
      * @param array $filter
-     * @param bool $includeContent
-     * @param int $pageNumber
-     * @return Bronto_Api_Rowset
+     * @param bool  $includeContent
+     * @param int   $pageNumber
+     *
+     * @return Rowset
      */
     public function readAll(array $filter = array(), $includeContent = true, $pageNumber = 1)
     {
-        $params = array();
+        $params                   = array();
         $params['filter']         = $filter;
-        $params['includeContent'] = (bool) $includeContent;
-        $params['pageNumber']     = (int)  $pageNumber;
+        $params['includeContent'] = (bool)$includeContent;
+        $params['pageNumber']     = (int)$pageNumber;
+
         return $this->read($params);
     }
 }

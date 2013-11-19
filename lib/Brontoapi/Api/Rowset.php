@@ -1,11 +1,15 @@
 <?php
 
 /**
- * @author Chris Jones <chris.jones@bronto.com>
+ * @author     Chris Jones <chris.jones@bronto.com>
  * @copyright  2011-2013 Bronto Software, Inc.
- * @license http://opensource.org/licenses/OSL-3.0 Open Software License v. 3.0 (OSL-3.0)
+ * @license    http://opensource.org/licenses/OSL-3.0 Open Software License v. 3.0 (OSL-3.0)
  */
-class Bronto_Api_Rowset implements SeekableIterator, Countable, ArrayAccess
+namespace Bronto\Api;
+
+use \Bronto\Api\Rowset\Exception as Exception;
+
+class Rowset implements \SeekableIterator, \Countable, \ArrayAccess
 {
     /**
      * The original data for each row.
@@ -24,7 +28,7 @@ class Bronto_Api_Rowset implements SeekableIterator, Countable, ArrayAccess
     /**
      * API Object
      *
-     * @var Bronto_Api_Object
+     * @var Object
      */
     protected $_apiObject;
 
@@ -40,7 +44,7 @@ class Bronto_Api_Rowset implements SeekableIterator, Countable, ArrayAccess
      *
      * @var string
      */
-    protected $_rowClass = 'Bronto_Api_Row';
+    protected $_rowClass = '\Bronto\Api\Row';
 
     /**
      * Iterator pointer.
@@ -57,7 +61,7 @@ class Bronto_Api_Rowset implements SeekableIterator, Countable, ArrayAccess
     protected $_count;
 
     /**
-     * Collection of instantiated Bronto_Api_Row objects.
+     * Collection of instantiated \Bronto\Api\Row objects.
      *
      * @var array
      */
@@ -91,26 +95,26 @@ class Bronto_Api_Rowset implements SeekableIterator, Countable, ArrayAccess
         }
 
         if (isset($config['rowClass'])) {
-            $this->_rowClass = (string) $config['rowClass'];
+            $this->_rowClass = (string)$config['rowClass'];
         }
 
         if (isset($config['data'])) {
-            $this->_data = (array) $config['data'];
+            $this->_data = (array)$config['data'];
             foreach ($this->_data as $key => $value) {
-                $this->_data[$key] = (array) $value;
+                $this->_data[$key] = (array)$value;
             }
         }
 
         if (isset($config['errors'])) {
-            $this->_errors = (array) $config['errors'];
+            $this->_errors = (array)$config['errors'];
         }
 
         if (isset($config['readOnly'])) {
-            $this->_readOnly = (bool) $config['readOnly'];
+            $this->_readOnly = (bool)$config['readOnly'];
         }
 
         if (isset($config['stored'])) {
-            $this->_stored = (bool) $config['stored'];
+            $this->_stored = (bool)$config['stored'];
         }
 
         if (isset($config['params'])) {
@@ -134,7 +138,7 @@ class Bronto_Api_Rowset implements SeekableIterator, Countable, ArrayAccess
     }
 
     /**
-     * @return Bronto_Api_Object
+     * @return Object
      */
     public function getApiObject()
     {
@@ -162,11 +166,12 @@ class Bronto_Api_Rowset implements SeekableIterator, Countable, ArrayAccess
      * Similar to the reset() function for arrays in PHP.
      * Required by interface Iterator.
      *
-     * @return Bronto_Api_Rowset Fluent interface.
+     * @return Rowset Fluent interface.
      */
     public function rewind()
     {
         $this->_pointer = 0;
+
         return $this;
     }
 
@@ -175,7 +180,7 @@ class Bronto_Api_Rowset implements SeekableIterator, Countable, ArrayAccess
      * Similar to the current() function for arrays in PHP
      * Required by interface Iterator.
      *
-     * @return Bronto_Api_Row current element from the collection
+     * @return Row current element from the collection
      */
     public function current()
     {
@@ -252,15 +257,18 @@ class Bronto_Api_Rowset implements SeekableIterator, Countable, ArrayAccess
      * Required by interface SeekableIterator.
      *
      * @param int $position the position to seek to
-     * @return Bronto_Api_Rowset
+     *
+     * @return Rowset
+     * @throws Exception
      */
     public function seek($position)
     {
-        $position = (int) $position;
+        $position = (int)$position;
         if ($position < 0 || $position >= $this->_count) {
-            throw new Bronto_Api_Rowset_Exception("Illegal index {$position}");
+            throw new Exception("Illegal index {$position}");
         }
         $this->_pointer = $position;
+
         return $this;
     }
 
@@ -269,24 +277,27 @@ class Bronto_Api_Rowset implements SeekableIterator, Countable, ArrayAccess
      * Required by the ArrayAccess implementation
      *
      * @param string $offset
+     *
      * @return boolean
      */
     public function offsetExists($offset)
     {
-        return isset($this->_data[(int) $offset]);
+        return isset($this->_data[(int)$offset]);
     }
 
     /**
      * Get the data for the given offset
      *
      * @param string $offset
+     *
      * @return array
+     * @throws Exception
      */
     public function offsetGetData($offset)
     {
-        $offset = (int) $offset;
+        $offset = (int)$offset;
         if ($offset < 0 || $offset >= $this->_count) {
-            throw new Bronto_Api_Rowset_Exception("Illegal index {$offset}");
+            throw new Exception("Illegal index {$offset}");
         }
 
         return $this->_data[$offset];
@@ -297,13 +308,15 @@ class Bronto_Api_Rowset implements SeekableIterator, Countable, ArrayAccess
      * Required by the ArrayAccess implementation
      *
      * @param string $offset
-     * @return Bronto_Api_Row
+     *
+     * @return Row
+     * @throws Exception
      */
     public function offsetGet($offset)
     {
-        $offset = (int) $offset;
+        $offset = (int)$offset;
         if ($offset < 0 || $offset >= $this->_count) {
-            throw new Bronto_Api_Rowset_Exception("Illegal index {$offset}");
+            throw new Exception("Illegal index {$offset}");
         }
         $this->_pointer = $offset;
 
@@ -315,7 +328,7 @@ class Bronto_Api_Rowset implements SeekableIterator, Countable, ArrayAccess
      * Required by the ArrayAccess implementation
      *
      * @param string $offset
-     * @param mixed $value
+     * @param mixed  $value
      */
     public function offsetSet($offset, $value)
     {
@@ -334,11 +347,11 @@ class Bronto_Api_Rowset implements SeekableIterator, Countable, ArrayAccess
     /**
      * Seamlessly iterate over this rowset
      *
-     * @return Bronto_Api_Rowset_Iterator
+     * @return Rowset\Iterator
      */
     public function iterate()
     {
-        return new Bronto_Api_Rowset_Iterator($this);
+        return new Rowset\Iterator($this);
     }
 
     /**
@@ -358,15 +371,17 @@ class Bronto_Api_Rowset implements SeekableIterator, Countable, ArrayAccess
             $errors = array();
             foreach ($this->_errors as $pointer) {
                 if ($this->offsetExists($pointer)) {
-                    $row = $this->offsetGet($pointer);
+                    $row      = $this->offsetGet($pointer);
                     $errors[] = array(
                         'code'    => $row->getErrorCode(),
                         'message' => $row->getErrorMessage(),
                     );
                 }
             }
+
             return $errors;
         }
+
         return false;
     }
 
@@ -382,7 +397,7 @@ class Bronto_Api_Rowset implements SeekableIterator, Countable, ArrayAccess
             );
             foreach ($this->_errors as $pointer) {
                 if ($this->offsetExists($pointer)) {
-                    $row = $this->offsetGet($pointer);
+                    $row   = $this->offsetGet($pointer);
                     $error = array(
                         'code'    => $row->getErrorCode(),
                         'message' => $row->getErrorMessage(),
@@ -390,8 +405,10 @@ class Bronto_Api_Rowset implements SeekableIterator, Countable, ArrayAccess
                     break;
                 }
             }
+
             return $error;
         }
+
         return false;
     }
 }

@@ -1,15 +1,17 @@
 <?php
 
 /**
- * @author Chris Jones <chris.jones@bronto.com>
+ * @author     Chris Jones <chris.jones@bronto.com>
  * @copyright  2011-2013 Bronto Software, Inc.
- * @license http://opensource.org/licenses/OSL-3.0 Open Software License v. 3.0 (OSL-3.0)
- * 
- * @link http://community.bronto.com/api/v4/objects/general/deliveryobject
+ * @license    http://opensource.org/licenses/OSL-3.0 Open Software License v. 3.0 (OSL-3.0)
  *
- * @method Bronto_Api_Delivery_Row createRow() createRow(array $data = array())
+ * @link       http://community.bronto.com/api/v4/objects/general/deliveryobject
+ *
+ * @method \Bronto\Api\Delivery\Row createRow() createRow(array $data = array())
  */
-class Bronto_Api_Delivery extends Bronto_Api_Object
+namespace Bronto\Api;
+
+class Delivery extends Object
 {
     /** Status */
     const STATUS_SENT     = 'sent';
@@ -46,7 +48,7 @@ class Bronto_Api_Delivery extends Bronto_Api_Object
             self::STATUS_ARCHIVED,
             self::STATUS_SKIPPED,
         ),
-        'type' => array(
+        'type'   => array(
             self::TYPE_NORMAL,
             self::TYPE_TEST,
             self::TYPE_TRANSACTIONAL,
@@ -56,31 +58,35 @@ class Bronto_Api_Delivery extends Bronto_Api_Object
 
     /**
      * @param array $filter
-     * @param bool $includeRecipients
-     * @param bool $includeContent
-     * @param int $pageNumber
-     * @return Bronto_Api_Rowset
+     * @param bool  $includeRecipients
+     * @param bool  $includeContent
+     * @param int   $pageNumber
+     *
+     * @return Rowset
      */
     public function readAll(array $filter = array(), $includeRecipients = false, $includeContent = false, $pageNumber = 1)
     {
-        $params = array();
+        $params                      = array();
         $params['filter']            = $filter;
-        $params['includeRecipients'] = (bool) $includeRecipients;
-        $params['includeContent']    = (bool) $includeContent;
-        $params['pageNumber']        = (int)  $pageNumber;
+        $params['includeRecipients'] = (bool)$includeRecipients;
+        $params['includeContent']    = (bool)$includeContent;
+        $params['pageNumber']        = (int)$pageNumber;
+
         return $this->read($params);
     }
 
     /**
      * @param array $filter
-     * @param int $pageNumber
-     * @return Bronto_Api_Rowset
+     * @param int   $pageNumber
+     *
+     * @return Rowset
      */
     public function readDeliveryRecipients(array $filter = array(), $pageNumber = 1)
     {
-        $params = array();
+        $params               = array();
         $params['filter']     = $filter;
-        $params['pageNumber'] = (int) $pageNumber;
+        $params['pageNumber'] = (int)$pageNumber;
+
         return $this->doRequest('readDeliveryRecipients', $params);
     }
 }

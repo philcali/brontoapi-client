@@ -6,7 +6,11 @@
  * @copyright  2011-2013 Bronto Software, Inc.
  * @license http://opensource.org/licenses/OSL-3.0 Open Software License v. 3.0 (OSL-3.0)
  */
-class Bronto_Api_Segment extends Bronto_Api_Object
+namespace Bronto\Api;
+
+use \Bronto\Api\Segment\Exception as Exception;
+
+class Segment extends Object
 {
     /**
      * @var array
@@ -18,7 +22,7 @@ class Bronto_Api_Segment extends Bronto_Api_Object
     /**
      * @param array $filter
      * @param int $pageNumber
-     * @return Bronto_Api_Rowset
+     * @return Rowset
      */
     public function readAll(array $filter = array(), $pageNumber = 1)
     {
@@ -30,9 +34,12 @@ class Bronto_Api_Segment extends Bronto_Api_Object
 
     /**
      * @param array $data
+     *
+     * @return Row|void
+     * @throws Exception
      */
     public function createRow(array $data = array())
     {
-        throw new Bronto_Api_Segment_Exception('You cannot create a Segment row.');
+        throw new Exception('You cannot create a Segment row.');
     }
 }

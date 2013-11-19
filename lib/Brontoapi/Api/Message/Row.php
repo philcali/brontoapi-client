@@ -10,14 +10,18 @@
  * @property string $status
  * @property string $messageFolderId
  * @property array $content
- * @method Bronto_Api_Message_Row delete() delete()
- * @method Bronto_Api_Message getApiObject() getApiObject()
+ * @method \Bronto\Api\Message\Row delete() delete()
+ * @method \Bronto\Api\Message getApiObject() getApiObject()
  */
-class Bronto_Api_Message_Row extends Bronto_Api_Row
+namespace Bronto\Api\Message;
+
+class Row extends \Bronto\Api\Row
 {
     /**
-     * @param Bronto_Api_DeliveryGroup_Row|string $deliveryGroup
-     * @return bool
+     * @param $deliveryGroup
+     *
+     * @return \Bronto\Api\Rowset
+     * @throws \Bronto\Api\Exception
      */
     public function addToDeliveryGroup($deliveryGroup)
     {
@@ -27,7 +31,7 @@ class Bronto_Api_Message_Row extends Bronto_Api_Row
         }
 
         $deliveryGroupId = $deliveryGroup;
-        if ($deliveryGroup instanceOf Bronto_Api_DeliveryGroup_Row) {
+        if ($deliveryGroup instanceOf \Bronto\Api\DeliveryGroup\Row) {
             if (!$deliveryGroup->id) {
                 $deliveryGroup = $deliveryGroup->read();
             }
@@ -39,7 +43,7 @@ class Bronto_Api_Message_Row extends Bronto_Api_Row
     }
 
     /**
-     * @return Bronto_Api_Message_Row
+     * @return Row
      */
     public function read()
     {
@@ -61,7 +65,7 @@ class Bronto_Api_Message_Row extends Bronto_Api_Row
     /**
      * @param bool $upsert
      * @param bool $refresh
-     * @return Bronto_Api_Message_Row
+     * @return Row
      */
     public function save($upsert = true, $refresh = false)
     {
@@ -71,8 +75,8 @@ class Bronto_Api_Message_Row extends Bronto_Api_Row
 
         try {
             parent::_save(true, $refresh);
-        } catch (Bronto_Api_Message_Exception $e) {
-            if ($e->getCode() === Bronto_Api_Message_Exception::MESSAGE_EXISTS) {
+        } catch (Exception $e) {
+            if ($e->getCode() === Exception::MESSAGE_EXISTS) {
                 $this->_refresh();
             } else {
                 $this->getApi()->throwException($e);

@@ -1,15 +1,17 @@
 <?php
 
 /**
- * @author Chris Jones <chris.jones@bronto.com>
+ * @author     Chris Jones <chris.jones@bronto.com>
  * @copyright  2011-2013 Bronto Software, Inc.
- * @license http://opensource.org/licenses/OSL-3.0 Open Software License v. 3.0 (OSL-3.0)
- * 
- * @link http://community.bronto.com/api/v4/objects/general/fieldobject
+ * @license    http://opensource.org/licenses/OSL-3.0 Open Software License v. 3.0 (OSL-3.0)
  *
- * @method Bronto_Api_Field_Row createRow() createRow(array $data = array())
+ * @link       http://community.bronto.com/api/v4/objects/general/fieldobject
+ *
+ * @method \Bronto\Api\Field\Row createRow() createRow(array $data = array())
  */
-class Bronto_Api_Field extends Bronto_Api_Object
+namespace Bronto\Api;
+
+class Field extends Object
 {
     /** Type */
     const TYPE_TEXT     = 'text';
@@ -58,42 +60,49 @@ class Bronto_Api_Field extends Bronto_Api_Object
 
     /**
      * @param array $filter
-     * @param int $pageNumber
-     * @return Bronto_Api_Rowset
+     * @param int   $pageNumber
+     *
+     * @return Rowset
      */
     public function readAll(array $filter = array(), $pageNumber = 1)
     {
-        $params = array();
+        $params               = array();
         $params['filter']     = $filter;
-        $params['pageNumber'] = (int) $pageNumber;
+        $params['pageNumber'] = (int)$pageNumber;
+
         return $this->read($params);
     }
 
     /**
-     * @param string $index
-     * @param Bronto_Api_Field_Row $field
-     * @return Bronto_Api_Field
+     * @param string    $index
+     * @param Field\Row $field
+     *
+     * @return Field
      */
-    public function addToCache($index, Bronto_Api_Field_Row $field)
+    public function addToCache($index, Field\Row $field)
     {
         $this->_objectCache[$index] = $field;
+
         return $this;
     }
 
     /**
-     * @param string $index
-     * @return Bronto_Api_Field_Row
+     * @param $index
+     *
+     * @return bool|Field\Row
      */
     public function getFromCache($index)
     {
-        if (isset($this->_objectCache[$index]) && $this->_objectCache[$index] instanceOf Bronto_Api_Field_Row) {
+        if (isset($this->_objectCache[$index]) && $this->_objectCache[$index] instanceOf Field\Row) {
             return $this->_objectCache[$index];
         }
+
         return false;
     }
 
     /**
      * @param string $name
+     *
      * @return string
      */
     public function normalize($name)
@@ -106,31 +115,34 @@ class Bronto_Api_Field extends Bronto_Api_Object
     }
 
     /**
-     * @param string $name
+     * @param       $name
      * @param array $values
+     *
+     * @return array
      */
     public function guessType($name, array $values)
     {
         // Check predefined fields first
-        if (isset(Bronto_Api_Field_Predefined::$normalizerMap[$name])) {
-            if (isset(Bronto_Api_Field_Predefined::$predefinedFields[$name])) {
+        if (isset(Field\Predefined::$normalizerMap[$name])) {
+            if (isset(Field\Predefined::$predefinedFields[$name])) {
                 return array(
-                    $name => Bronto_Api_Field_Predefined::$predefinedFields[$name]
+                    $name => Field\Predefined::$predefinedFields[$name]
                 );
             }
         } else {
-            foreach (Bronto_Api_Field_Predefined::$normalizerMap as $key => $synonyms) {
+            foreach (Field\Predefined::$normalizerMap as $key => $synonyms) {
                 if (in_array($name, $synonyms)) {
                     return array(
-                        $key => Bronto_Api_Field_Predefined::$predefinedFields[$key]
+                        $key => Field\Predefined::$predefinedFields[$key]
                     );
                 }
             }
         }
 
         // Try to type guess
-        $typeGuesser = new Bronto_Api_Field_TypeGuesser();
+        $typeGuesser = new Field\TypeGuesser();
         $typeGuesser->processValues($values);
+
         return $typeGuesser->getChoice();
     }
 }

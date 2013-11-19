@@ -9,14 +9,17 @@
  * @property int $permissions
  * @property bool $active
  * @property string $accountId
- * @method Bronto_Api_ApiToken_Row save() save()
- * @method Bronto_Api_ApiToken_Row delete() delete()
- * @method Bronto_Api_ApiToken getApiObject() getApiObject()
+ * @method \Bronto\Api\ApiToken\Row save() save()
+ * @method \Bronto\Api\ApiToken\Row delete() delete()
+ * @method \Bronto\Api\ApiToken getApiObject() getApiObject()
  */
-class Bronto_Api_ApiToken_Row extends Bronto_Api_Row
+namespace Bronto\Api\ApiToken;
+
+class Row extends \Bronto\Api\Row
 {
     /**
-     * @return Bronto_Api_ApiToken_Row
+     * @return $this
+     * @throws Exception
      */
     public function read()
     {
@@ -32,7 +35,7 @@ class Bronto_Api_ApiToken_Row extends Bronto_Api_Row
                 )
             );
         } else {
-            throw new Bronto_Api_ApiToken_Exception('Trying to read ApiToken without Id or Name for lookup');
+            throw new Exception('Trying to read ApiToken without Id or Name for lookup');
         }
 
         parent::_read($params);
@@ -40,7 +43,8 @@ class Bronto_Api_ApiToken_Row extends Bronto_Api_Row
     }
 
     /**
-     * @return Bronto_Api_Account_Row
+     * @return Row
+     * @throws Exception
      */
     public function getAccount()
     {
@@ -49,7 +53,7 @@ class Bronto_Api_ApiToken_Row extends Bronto_Api_Row
                 $this->read();
             }
             if (!$this->accountId) {
-                throw new Bronto_Api_ApiToken_Exception('No accountId specified to retrieve Account');
+                throw new Exception('No accountId specified to retrieve Account');
             }
         }
 

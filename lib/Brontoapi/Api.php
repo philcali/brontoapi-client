@@ -1,13 +1,13 @@
 <?php
 
 /**
- * @author Chris Jones <chris.jones@bronto.com>
+ * @author     Chris Jones <chris.jones@bronto.com>
  * @copyright  2011-2013 Bronto Software, Inc.
- * @license http://opensource.org/licenses/OSL-3.0 Open Software License v. 3.0 (OSL-3.0)
+ * @license    http://opensource.org/licenses/OSL-3.0 Open Software License v. 3.0 (OSL-3.0)
  */
-namespace Brontoapi;
+namespace Bronto;
 
-use Brontoapi\BrontoapiException;
+use \Bronto\Api\Exception as Exception;
 
 class Api
 {
@@ -15,11 +15,6 @@ class Api
     const BASE_WSDL     = 'https://api.bronto.com/v4?wsdl';
     const BASE_LOCATION = 'https://api.bronto.com/v4';
     const BASE_URL      = 'http://api.bronto.com/v4';
-
-    /**
-     * @var \Brontoapi\Client
-     */
-    protected $_soapClient;
 
     /**
      * API token
@@ -33,11 +28,11 @@ class Api
      */
     protected $_options = array(
         // Bronto
-        'soap_client'     => '\Brontoapi\Client',
-        'refresh_on_save' => false,
-        'retry_limit'     => 5,
-        'debug'           => false,
-        'retryer'         => array(
+        'soap_client'        => '\Bronto\SoapClient',
+        'refresh_on_save'    => false,
+        'retry_limit'        => 5,
+        'debug'              => false,
+        'retryer'            => array(
             'type' => null,
             'path' => null,
         ),
@@ -71,27 +66,47 @@ class Api
     protected $_authenticated = false;
 
     /**
-     * @var Brontoapi\Util\Retryer\RetryerInterface
+     * @var SoapClient
+     */
+    protected $_soapClient;
+
+    /**
+     * @var Util\Retryer\RetryerInterface
      */
     protected $_retryer;
 
     /**
-     * @var Bronto_Util_Uuid
+     * @var Util\Uuid
      */
     protected $_uuid;
 
     /**
-     * @param string $token
-     * @param array $options
+     * @param null                          $token
+     * @param array                         $options
+     * @param SoapClient                    $soapClient
+     * @param Util\Retryer\RetryerInterface $retryer
+     * @param Util\Uuid                     $uuid
+     *
+     * @throws Exception
      */
-    public function __construct($token = null, array $options = array())
+    public function __construct(
+        $token = null,
+        array $options = array(),
+        SoapClient $soapClient,
+        Util\Retryer\RetryerInterface $retryer,
+        Util\Uuid $uuid
+    )
     {
+        $this->_soapClient = $soapClient;
+        $this->_retryer    = $retryer;
+        $this->_uuid       = $uuid;
+
         if (!extension_loaded('soap')) {
-            throw new \BrontoapiException('SOAP extension is not loaded.');
+            throw new Exception('SOAP extension is not loaded.');
         }
 
         if (!extension_loaded('openssl')) {
-            throw new \BrontoapiException('OpenSSL extension is not loaded.');
+            throw new Exception('OpenSSL extension is not loaded.');
         }
 
         $this->_options['compression'] = SOAP_COMPRESSION_ACCEPT | SOAP_COMPRESSION_GZIP;
@@ -105,24 +120,25 @@ class Api
     }
 
     /**
-     * Login with API token
-     *
-     * @return Bronto_Api
+     * @return $this
+     * @throws Exception
      */
     public function login()
     {
         $token = $this->getToken();
         if (empty($token)) {
-            throw new Bronto_Api_Exception('Token is empty or invalid.', Bronto_Api_Exception::NO_TOKEN);
+            throw new Exception('Token is empty or invalid.', Exception::NO_TOKEN);
         }
 
         try {
             // Get a new SoapClient
             $this->reset();
+
+            /** @var SoapClient $client */
             $client    = $this->getSoapClient(false);
             $sessionId = $client->login(array('apiToken' => $token))->return;
             $client->__setSoapHeaders(array(
-                new SoapHeader(self::BASE_URL, 'sessionHeader', array('sessionId' => $sessionId))
+                new \SoapHeader(self::BASE_URL, 'sessionHeader', array('sessionId' => $sessionId))
             ));
             $this->_authenticated = true;
         } catch (Exception $e) {
@@ -133,35 +149,36 @@ class Api
     }
 
     /**
-     * We want all Exceptions to be Bronto_Api_Exception for request/response
+     * We want all Exceptions to be \Bronto\Api\Exception for request/response
      *
      * @param string|Exception $exception
-     * @param string $message
-     * @param string $code
-     * @return Bronto_Api_Exception
+     * @param null             $message
+     * @param null             $code
+     *
+     * @throws Exception
      */
     public function throwException($exception, $message = null, $code = null)
     {
-        if ($exception instanceOf Exception) {
-            if ($exception instanceOf Bronto_Api_Exception) {
+        if ($exception instanceOf \Exception) {
+            if ($exception instanceOf Exception) {
                 // Good
             } else {
                 // Convert
-                $exception = new Bronto_Api_Exception($exception->getMessage(), $exception->getCode(), null, $exception);
+                /** @var \Bronto\Api\Exception $exception */
+                $exception = new Exception($exception->getMessage(), $exception->getCode(), null, $exception);
             }
         } else {
             if (is_string($exception)) {
                 if (class_exists($exception, false)) {
                     $exception = new $exception($message, $code);
                 } else {
-                    $exception = new Bronto_Api_Exception($exception);
+                    $exception = new Exception($exception);
                 }
             }
         }
 
         // For tracking request/response in debug mode
         if ($this->getDebug()) {
-            /* @var $exception Bronto_Api_Exception */
             $exception->setRequest($this->getLastRequest());
             $exception->setResponse($this->getLastResponse());
         }
@@ -172,13 +189,15 @@ class Api
     /**
      * Set API token
      *
-     * @param string $token
-     * @return Bronto_Api
+     * @param $token
+     *
+     * @return $this
      */
     public function setToken($token)
     {
         $this->reset();
         $this->_token = $token;
+
         return $this;
     }
 
@@ -193,11 +212,11 @@ class Api
     }
 
     /**
-     * @return Bronto_Api_ApiToken_Row
+     * @return Api\ApiToken\Row
      */
     public function getTokenInfo()
     {
-        $apiToken = $this->getApiTokenObject()->createRow();
+        $apiToken     = $this->getApiTokenObject()->createRow();
         $apiToken->id = $this->getToken();
         $apiToken->read();
 
@@ -206,20 +225,23 @@ class Api
 
     /**
      * @param array $options
-     * @return Bronto_Api
+     *
+     * @return Api
      */
     protected function _setOptions(array $options = array())
     {
         foreach ($options as $name => $value) {
             $this->_setOption($name, $value);
         }
+
         return $this;
     }
 
     /**
      * @param string $name
-     * @param mixed $value
-     * @return Bronto_Api
+     * @param mixed  $value
+     *
+     * @return Api
      */
     protected function _setOption($name, $value)
     {
@@ -255,12 +277,14 @@ class Api
 
             $this->_options[$name] = $value;
         }
+
         return $this;
     }
 
     /**
      * @param string $name
-     * @param mixed $default
+     * @param mixed  $default
+     *
      * @return mixed
      */
     public function getOption($name, $default = null)
@@ -268,13 +292,14 @@ class Api
         if (isset($this->_options[$name])) {
             return $this->_options[$name];
         }
+
         return $default;
     }
 
     /**
      * Proxy for intellisense
      *
-     * @return Bronto_Api_Account
+     * @return Api\Account
      */
     public function getAccountObject()
     {
@@ -284,7 +309,7 @@ class Api
     /**
      * Proxy for intellisense
      *
-     * @return Bronto_Api_Activity
+     * @return Api\Activity
      */
     public function getActivityObject()
     {
@@ -294,7 +319,7 @@ class Api
     /**
      * Proxy for intellisense
      *
-     * @return Bronto_Api_ApiToken
+     * @return Api\ApiToken
      */
     public function getApiTokenObject()
     {
@@ -304,17 +329,17 @@ class Api
     /**
      * Proxy for intellisense
      *
-     * @return Bronto_Api_Contact
+     * @return Api\Contact
      */
     public function getContactObject()
     {
         return $this->getObject('contact');
     }
-    
+
     /**
      * Proxy for intellisense
      *
-     * @return Bronto_Api_ContentTag
+     * @return Api\ContentTag
      */
     public function getContentTagObject()
     {
@@ -324,7 +349,7 @@ class Api
     /**
      * Proxy for intellisense
      *
-     * @return Bronto_Api_Conversion
+     * @return Api\Conversion
      */
     public function getConversionObject()
     {
@@ -334,7 +359,7 @@ class Api
     /**
      * Proxy for intellisense
      *
-     * @return Bronto_Api_Delivery
+     * @return Api\Delivery
      */
     public function getDeliveryObject()
     {
@@ -344,7 +369,7 @@ class Api
     /**
      * Proxy for intellisense
      *
-     * @return Bronto_Api_DeliveryGroup
+     * @return Api\DeliveryGroup
      */
     public function getDeliveryGroupObject()
     {
@@ -354,7 +379,7 @@ class Api
     /**
      * Proxy for intellisense
      *
-     * @return Bronto_Api_Field
+     * @return Api\Field
      */
     public function getFieldObject()
     {
@@ -364,7 +389,7 @@ class Api
     /**
      * Proxy for intellisense
      *
-     * @return Bronto_Api_Message
+     * @return Api\Message
      */
     public function getMessageObject()
     {
@@ -374,7 +399,7 @@ class Api
     /**
      * Proxy for intellisense
      *
-     * @return Bronto_Api_MessageRule
+     * @return Api\MessageRule
      */
     public function getMessageRuleObject()
     {
@@ -384,7 +409,7 @@ class Api
     /**
      * Proxy for intellisense
      *
-     * @return Bronto_Api_List
+     * @return Api\List
      */
     public function getListObject()
     {
@@ -394,7 +419,7 @@ class Api
     /**
      * Proxy for intellisense
      *
-     * @return Bronto_Api_Login
+     * @return Api\Login
      */
     public function getLoginObject()
     {
@@ -404,7 +429,7 @@ class Api
     /**
      * Proxy for intellisense
      *
-     * @return Bronto_Api_Order
+     * @return Api\Order
      */
     public function getOrderObject()
     {
@@ -414,7 +439,7 @@ class Api
     /**
      * Proxy for intellisense
      *
-     * @return Bronto_Api_Segment
+     * @return Api\Segment
      */
     public function getSegmentObject()
     {
@@ -425,14 +450,15 @@ class Api
      * Lazy loads our API objects
      *
      * @param string $object
-     * @return Bronto_Api_Object
+     *
+     * @return Api\Object
      */
     public function getObject($object)
     {
         $object = ucfirst($object);
 
         if (!isset($this->_classCache[$object])) {
-            $className = "Bronto_Api_{$object}";
+            $className = "\Bronto\Api\{$object}";
             if (class_exists($className)) {
                 $this->_classCache[$object] = new $className(array('api' => $this));
             } else {
@@ -445,13 +471,14 @@ class Api
 
     /**
      * @param bool $authenticate
+     *
      * @return SoapClient
      */
     public function getSoapClient($authenticate = true)
     {
         if ($this->_soapClient == null) {
-            $this->_connected = false;
-            $soapClientClass  = $this->getOption('soap_client', 'Bronto_SoapClient');
+            $this->_connected  = false;
+            $soapClientClass   = $this->getOption('soap_client', '\Bronto\SoapClient');
             $this->_soapClient = new $soapClientClass(self::BASE_WSDL, array(
                 'soap_version' => $this->_options['soap_version'],
                 'compression'  => $this->_options['compression'],
@@ -468,27 +495,30 @@ class Api
                 $this->login();
             }
         }
+
         return $this->_soapClient;
     }
 
     /**
-     * @return Bronto_Api
+     * @return Api
      */
     public function reset()
     {
         $this->_connected     = false;
         $this->_authenticated = false;
         $this->_soapClient    = null;
+
         return $this;
     }
 
     /**
      * @param bool $value
-     * @return Bronto_Api
+     *
+     * @return Api
      */
     public function setDebug($value)
     {
-        return $this->_setOption('debug', (bool) $value);
+        return $this->_setOption('debug', (bool)$value);
     }
 
     /**
@@ -496,20 +526,21 @@ class Api
      */
     public function getDebug()
     {
-        return (bool) $this->_options['debug'];
+        return (bool)$this->_options['debug'];
     }
 
     /**
      * @param array $options
-     * @return Bronto_Util_Retryer_RetryerInterface
+     *
+     * @return Util\Retryer\RetryerInterface
      */
     public function getRetryer(array $options = array())
     {
-        if (!($this->_retryer instanceOf Bronto_Util_Retryer_RetryerInterface)) {
+        if (!($this->_retryer instanceOf Util\Retryer\RetryerInterface)) {
             $options = array_merge($this->_options['retryer'], $options);
             switch ($options['type']) {
                 case 'file':
-                    $this->_retryer = new Bronto_Util_Retryer_FileRetryer($options);
+                    $this->_retryer = new Util\Retryer\FileRetryer($options);
                     break;
                 default:
                     return false;
@@ -521,12 +552,12 @@ class Api
     }
 
     /**
-     * @return Bronto_Util_Retryer_RetryerInterface
+     * @return Util\Uuid
      */
     public function getUuid()
     {
         if (!$this->_uuid) {
-            $this->_uuid = new Bronto_Util_Uuid();
+            $this->_uuid = new Util\Uuid();
         }
 
         return $this->_uuid;
@@ -537,7 +568,7 @@ class Api
      */
     public function isConnected()
     {
-        return (bool) $this->_connected;
+        return (bool)$this->_connected;
     }
 
     /**
@@ -545,18 +576,19 @@ class Api
      */
     public function isAuthenticated()
     {
-        return (bool) $this->_authenticated;
+        return (bool)$this->_authenticated;
     }
 
     /**
      * Seamlessly iterate over a rowset.
      *
-     * @param Bronto_Api_Rowset $rowset
-     * @return Bronto_Api_Rowset_Iterator
+     * @param Api\Rowset $rowset
+     *
+     * @return Api\Rowset\Iterator
      */
-    public function iterate(Bronto_Api_Rowset $rowset)
+    public function iterate(Api\Rowset $rowset)
     {
-        return new Bronto_Api_Rowset_Iterator($rowset);
+        return new Api\Rowset\Iterator($rowset);
     }
 
     /**
@@ -569,6 +601,7 @@ class Api
         if ($this->_soapClient !== null) {
             return $this->_soapClient->__getLastRequest();
         }
+
         return '';
     }
 
@@ -582,6 +615,7 @@ class Api
         if ($this->_soapClient !== null) {
             return $this->_soapClient->__getLastResponse();
         }
+
         return '';
     }
 
@@ -595,6 +629,7 @@ class Api
         if ($this->_soapClient !== null) {
             return $this->_soapClient->__getLastRequestHeaders();
         }
+
         return '';
     }
 
@@ -608,6 +643,7 @@ class Api
         if ($this->_soapClient !== null) {
             return $this->_soapClient->__getLastResponseHeaders();
         }
+
         return '';
     }
 

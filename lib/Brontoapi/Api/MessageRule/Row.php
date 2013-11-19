@@ -1,22 +1,23 @@
 <?php
 
 /**
- * 
+ *
  * @copyright  2011-2013 Bronto Software, Inc.
- * @license http://opensource.org/licenses/OSL-3.0 Open Software License v. 3.0 (OSL-3.0)
- * 
+ * @license    http://opensource.org/licenses/OSL-3.0 Open Software License v. 3.0 (OSL-3.0)
+ *
  * @property-read id
  * @property name
  * @property type
  * @property messagedId
- * @method Bronto_Api_MessageRule_Row delete() delete()
- * @method Bronto_Api_MessageRule getApiObject() getApiObject()
+ * @method \Bronto\Api\MessageRule\Row delete() delete()
+ * @method \Bronto\Api\MessageRule getApiObject() getApiObject()
  */
-class Bronto_Api_MessageRule_Row extends Bronto_Api_Row
+namespace Bronto\Api\MessageRule;
+
+class Row extends \Bronto\Api\Row
 {
     /**
-     * @param bool $returnData
-     * @return Bronto_Api_MessageRule_Row
+     * @return Row
      */
     public function read()
     {
@@ -31,13 +32,14 @@ class Bronto_Api_MessageRule_Row extends Bronto_Api_Row
             );
         }
 
-        return parent::_read($params, $returnData);
+        return parent::_read($params);
     }
 
     /**
      * @param bool $upsert
      * @param bool $refresh
-     * @return Bronto_Api_MessageRule_Row
+     *
+     * @return Row
      */
     public function save($upsert = true, $refresh = false)
     {
@@ -47,8 +49,8 @@ class Bronto_Api_MessageRule_Row extends Bronto_Api_Row
 
         try {
             parent::_save(true, $refresh);
-        } catch (Bronto_Api_MessageRule_Exception $e) {
-            if ($e->getCode() === Bronto_Api_MessageRule_Exception::AUTOMATOR_EXISTS) {
+        } catch (Exception $e) {
+            if ($e->getCode() === Exception::AUTOMATOR_EXISTS) {
                 $this->_refresh();
             } else {
                 $this->getApi()->throwException($e);

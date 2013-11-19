@@ -1,11 +1,15 @@
 <?php
 
 /**
- * @author Chris Jones <chris.jones@bronto.com>
+ * @author     Chris Jones <chris.jones@bronto.com>
  * @copyright  2011-2013 Bronto Software, Inc.
- * @license http://opensource.org/licenses/OSL-3.0 Open Software License v. 3.0 (OSL-3.0)
+ * @license    http://opensource.org/licenses/OSL-3.0 Open Software License v. 3.0 (OSL-3.0)
  */
-abstract class Bronto_Api_Row implements ArrayAccess, IteratorAggregate
+namespace Bronto\Api;
+
+use Bronto\Api\Row\Exception as Exception;
+
+abstract class Row implements \ArrayAccess, \IteratorAggregate
 {
     /**
      * The data for each column in the row (column_name => value).
@@ -59,7 +63,7 @@ abstract class Bronto_Api_Row implements ArrayAccess, IteratorAggregate
     /**
      * API Object
      *
-     * @var Bronto_Api_Object
+     * @var Object
      */
     protected $_apiObject;
 
@@ -92,16 +96,18 @@ abstract class Bronto_Api_Row implements ArrayAccess, IteratorAggregate
      * Constructor
      *
      * @param array $config
+     *
+     * @throws Exception
      */
     public function __construct(array $config = array())
     {
-        if (isset($config['apiObject']) && $config['apiObject'] instanceof Bronto_Api_Object) {
+        if (isset($config['apiObject']) && $config['apiObject'] instanceof Object) {
             $this->_apiObject = $config['apiObject'];
         }
 
         if (isset($config['data'])) {
             if (!is_array($config['data'])) {
-                throw new Bronto_Api_Row_Exception('Data must be an array');
+                throw new Exception('Data must be an array');
             }
             $this->setData($config['data']);
         }
@@ -109,8 +115,8 @@ abstract class Bronto_Api_Row implements ArrayAccess, IteratorAggregate
         if (isset($config['stored']) && $config['stored'] === true) {
             $this->_cleanData = $this->_data;
         } else {
-            $this->_isLoaded       = false;
-            $this->_cleanData      = array();
+            $this->_isLoaded  = false;
+            $this->_cleanData = array();
             foreach ($this->_data as $key => $value) {
                 $this->_modifiedFields[$key] = true;
             }
@@ -125,18 +131,19 @@ abstract class Bronto_Api_Row implements ArrayAccess, IteratorAggregate
 
     /**
      * @param array $data
-     * @return Bronto_Api_Row
+     *
+     * @return Row
      */
     public function setData(array $data = array())
     {
         if (isset($data['isNew'])) {
-            $this->_isNew    = (bool) $data['isNew'];
+            $this->_isNew    = (bool)$data['isNew'];
             $this->_isLoaded = true;
             unset($data['isNew']);
         }
 
         if (isset($data['isError'])) {
-            $this->_isError  = (bool) $data['isError'];
+            $this->_isError = (bool)$data['isError'];
             if ($this->_isError) {
                 $this->_readOnly = true;
                 $this->_isLoaded = false;
@@ -145,12 +152,12 @@ abstract class Bronto_Api_Row implements ArrayAccess, IteratorAggregate
         }
 
         if (isset($data['errorCode'])) {
-            $this->_errorCode = (int) $data['errorCode'];
+            $this->_errorCode = (int)$data['errorCode'];
             unset($data['errorCode']);
         }
 
         if (isset($data['errorString'])) {
-            $this->_errorString = (string) $data['errorString'];
+            $this->_errorString = (string)$data['errorString'];
             unset($data['errorString']);
         }
 
@@ -177,6 +184,7 @@ abstract class Bronto_Api_Row implements ArrayAccess, IteratorAggregate
      * Required by the ArrayAccess implementation
      *
      * @param string $offset
+     *
      * @return boolean
      */
     public function offsetExists($offset)
@@ -189,6 +197,7 @@ abstract class Bronto_Api_Row implements ArrayAccess, IteratorAggregate
      * Required by the ArrayAccess implementation
      *
      * @param string $offset
+     *
      * @return string
      */
     public function offsetGet($offset)
@@ -201,7 +210,7 @@ abstract class Bronto_Api_Row implements ArrayAccess, IteratorAggregate
      * Required by the ArrayAccess implementation
      *
      * @param string $offset
-     * @param mixed $value
+     * @param mixed  $value
      */
     public function offsetSet($offset, $value)
     {
@@ -216,15 +225,15 @@ abstract class Bronto_Api_Row implements ArrayAccess, IteratorAggregate
      */
     public function offsetUnset($offset)
     {
-        return $this->__unset($offset);
+        $this->__unset($offset);
     }
 
     /**
-     * @return ArrayIterator
+     * @return \ArrayIterator
      */
     public function getIterator()
     {
-        return new ArrayIterator((array) $this->_data);
+        return new \ArrayIterator((array)$this->_data);
     }
 
     /**
@@ -234,7 +243,7 @@ abstract class Bronto_Api_Row implements ArrayAccess, IteratorAggregate
      */
     public function toArray()
     {
-        return (array) $this->_data;
+        return (array)$this->_data;
     }
 
     /**
@@ -246,15 +255,16 @@ abstract class Bronto_Api_Row implements ArrayAccess, IteratorAggregate
     }
 
     /**
-     * @return Bronto_Api_Row
+     * @return Row
+     *
+     * @throws Exception
      */
     public function persist()
     {
         if ($this->_readOnly === true) {
-            throw new Bronto_Api_Row_Exception(sprintf("Cannot persist a %s record.", $this->getApiObject()->getName()));
+            throw new Exception(sprintf("Cannot persist a %s record.", $this->getApiObject()->getName()));
         }
 
-        $type = false;
         if ($this->getApiObject()->hasMethodType('addOrUpdate')) {
             $type = 'addOrUpdate';
         } else {
@@ -269,7 +279,9 @@ abstract class Bronto_Api_Row implements ArrayAccess, IteratorAggregate
     }
 
     /**
-     * @return Bronto_Api_Row
+     * @return Row
+     *
+     * @throws \Exception
      */
     public function persistDelete()
     {
@@ -285,12 +297,13 @@ abstract class Bronto_Api_Row implements ArrayAccess, IteratorAggregate
      * Persist an object for write caching
      *
      * @param string $type
-     * @param mixed $defaultIndex
-     * @return Bronto_Api_Row
+     * @param mixed  $defaultIndex
+     *
+     * @return Row
      */
     public function _persist($type, $defaultIndex = false)
     {
-        $data = array_intersect_key($this->_data, $this->_modifiedFields);
+        $data           = array_intersect_key($this->_data, $this->_modifiedFields);
         $tempPrimaryKey = $this->_primary;
         if (!empty($this->{$tempPrimaryKey})) {
             $defaultIndex = $this->{$tempPrimaryKey};
@@ -302,38 +315,44 @@ abstract class Bronto_Api_Row implements ArrayAccess, IteratorAggregate
         }
 
         $this->getApiObject()->addToWriteCache($type, $data, $defaultIndex);
+
         return $this;
     }
 
     /**
-     * @return Bronto_Api_Row
+     * @return $this
+     * @throws Exception
      */
     public function read()
     {
-        $data = array();
         if ($this->id) {
             $data = array('id' => $this->id);
         } else {
-            throw new Bronto_Api_Row_Exception('Trying to read Row without unique identifier for lookup');
+            throw new Exception('Trying to read Row without unique identifier for lookup');
         }
 
         $this->_read($data);
+
         return $this;
     }
 
     /**
      * @param bool $upsert
      * @param bool $refresh
-     * @return Bronto_Api_Row
+     *
+     * @return Row
      */
     public function save($upsert = false, $refresh = false)
     {
         $this->_save($upsert, $refresh);
+
         return $this;
     }
 
     /**
-     * @return Bronto_Api_Row
+     * @return Row
+     *
+     * @throws \Exception
      */
     public function delete()
     {
@@ -342,7 +361,6 @@ abstract class Bronto_Api_Row implements ArrayAccess, IteratorAggregate
             throw new $exceptionClass('Cannot delete a row of type: ' . $this->getApiObject()->getName());
         }
 
-        $data = array();
         if (!$this->id) {
             $this->_refresh();
         }
@@ -355,11 +373,13 @@ abstract class Bronto_Api_Row implements ArrayAccess, IteratorAggregate
         }
 
         $this->_delete($data);
+
         return $this;
     }
 
     /**
      * Refreshes properties from the API.
+     *
      * @param bool $pull
      */
     protected function _refresh($pull = true)
@@ -367,12 +387,14 @@ abstract class Bronto_Api_Row implements ArrayAccess, IteratorAggregate
         if ($pull) {
             $this->read();
         }
-        $this->_cleanData = $this->_data;
+        $this->_cleanData      = $this->_data;
         $this->_modifiedFields = array();
     }
 
     /**
      * @param array $filter
+     *
+     * @throws \Exception
      */
     protected function _read(array $filter = array())
     {
@@ -381,12 +403,12 @@ abstract class Bronto_Api_Row implements ArrayAccess, IteratorAggregate
             throw new $exceptionClass('Trying to read Row without unique identifier for lookup');
         }
 
-        /* @var $rowset Bronto_Api_Rowset */
+        /** @var Rowset $rowset */
         $rowset = $this->getApiObject()->readAll($filter);
 
         if ($rowset->hasErrors()) {
             // Reset class
-            $error = $rowset->getError();
+            $error              = $rowset->getError();
             $this->_readOnly    = true;
             $this->_isLoaded    = false;
             $this->_isError     = true;
@@ -447,11 +469,13 @@ abstract class Bronto_Api_Row implements ArrayAccess, IteratorAggregate
 
     /**
      * @param bool $upsert
+     *
+     * @throws Exception
      */
     protected function _add($upsert = false)
     {
         if ($this->_readOnly === true) {
-            throw new Bronto_Api_Row_Exception(sprintf("Cannot create %s record.", $this->getApiObject()->getName()));
+            throw new Exception(sprintf("Cannot create %s record.", $this->getApiObject()->getName()));
         }
 
         $data = array_intersect_key($this->_data, $this->_modifiedFields);
@@ -467,7 +491,7 @@ abstract class Bronto_Api_Row implements ArrayAccess, IteratorAggregate
 
         if ($rowset->hasErrors()) {
             // Reset class
-            $error = $rowset->getError();
+            $error              = $rowset->getError();
             $this->_readOnly    = true;
             $this->_isLoaded    = false;
             $this->_isError     = true;
@@ -490,10 +514,13 @@ abstract class Bronto_Api_Row implements ArrayAccess, IteratorAggregate
         }
     }
 
+    /**
+     * @throws Exception
+     */
     protected function _update()
     {
         if ($this->_readOnly === true) {
-            throw new Bronto_Api_Row_Exception(sprintf("Cannot update %s record.", $this->getApiObject()->getName()));
+            throw new Exception(sprintf("Cannot update %s record.", $this->getApiObject()->getName()));
         }
 
         $data = array_intersect_key($this->_data, $this->_modifiedFields);
@@ -506,7 +533,7 @@ abstract class Bronto_Api_Row implements ArrayAccess, IteratorAggregate
 
             if ($rowset->hasErrors()) {
                 // Reset class
-                $error = $rowset->getError();
+                $error              = $rowset->getError();
                 $this->_readOnly    = true;
                 $this->_isLoaded    = false;
                 $this->_isError     = true;
@@ -532,18 +559,20 @@ abstract class Bronto_Api_Row implements ArrayAccess, IteratorAggregate
 
     /**
      * @param array $data
+     *
+     * @throws Exception
      */
     protected function _delete(array $data)
     {
         if ($this->_readOnly === true) {
-            throw new Bronto_Api_Row_Exception(sprintf("Cannot delete this read-only %s record.", $this->getApiObject()->getName()));
+            throw new Exception(sprintf("Cannot delete this read-only %s record.", $this->getApiObject()->getName()));
         }
 
         $rowset = $this->getApiObject()->delete(array($data));
 
         if ($rowset->hasErrors()) {
             // Reset class
-            $error = $rowset->getError();
+            $error              = $rowset->getError();
             $this->_readOnly    = true;
             $this->_isLoaded    = false;
             $this->_isError     = true;
@@ -573,6 +602,7 @@ abstract class Bronto_Api_Row implements ArrayAccess, IteratorAggregate
      * Retrieve row field value
      *
      * @param  string $columnName The user-specified column name.
+     *
      * @return string             The corresponding column value.
      */
     public function __get($columnName)
@@ -580,6 +610,7 @@ abstract class Bronto_Api_Row implements ArrayAccess, IteratorAggregate
         if (!array_key_exists($columnName, $this->_data)) {
             return null;
         }
+
         return $this->_data[$columnName];
     }
 
@@ -592,7 +623,7 @@ abstract class Bronto_Api_Row implements ArrayAccess, IteratorAggregate
     public function __set($columnName, $value)
     {
         if ($this->_readOnly === false) {
-            $this->_data[$columnName] = $value;
+            $this->_data[$columnName]           = $value;
             $this->_modifiedFields[$columnName] = true;
         }
     }
@@ -612,7 +643,8 @@ abstract class Bronto_Api_Row implements ArrayAccess, IteratorAggregate
     /**
      * Test existence of row field
      *
-     * @param  string  $columnName   The column key.
+     * @param  string $columnName The column key.
+     *
      * @return bool
      */
     public function __isset($columnName)
@@ -621,17 +653,19 @@ abstract class Bronto_Api_Row implements ArrayAccess, IteratorAggregate
     }
 
     /**
-     * @param Bronto_Api_Object $apiObject
-     * @return Bronto_Api_Row
+     * @param \Bronto\Api\Object $apiObject
+     *
+     * @return $this
      */
-    public function setApiObject(Bronto_Api_Object $apiObject)
+    public function setApiObject(Object $apiObject)
     {
         $this->_apiObject = $apiObject;
+
         return $this;
     }
 
     /**
-     * @return Bronto_Api_Object
+     * @return Object
      */
     public function getApiObject()
     {
@@ -639,7 +673,7 @@ abstract class Bronto_Api_Row implements ArrayAccess, IteratorAggregate
     }
 
     /**
-     * @return Bronto_Api
+     * @return \Bronto\Api
      */
     public function getApi()
     {
@@ -660,11 +694,12 @@ abstract class Bronto_Api_Row implements ArrayAccess, IteratorAggregate
      * Set the read-only status of the row.
      *
      * @param boolean $flag
+     *
      * @return boolean
      */
     public function setReadOnly($flag)
     {
-        $this->_readOnly = (bool) $flag;
+        $this->_readOnly = (bool)$flag;
     }
 
     /**
@@ -685,11 +720,12 @@ abstract class Bronto_Api_Row implements ArrayAccess, IteratorAggregate
 
     /**
      * @param string $key
+     *
      * @return bool
      */
     public function isDateField($key)
     {
-        return (bool) isset($this->_dateFields[$key]);
+        return (bool)isset($this->_dateFields[$key]);
     }
 
     /**
@@ -697,7 +733,7 @@ abstract class Bronto_Api_Row implements ArrayAccess, IteratorAggregate
      */
     public function isNew()
     {
-        return (bool) $this->_isNew;
+        return (bool)$this->_isNew;
     }
 
     /**
@@ -705,7 +741,7 @@ abstract class Bronto_Api_Row implements ArrayAccess, IteratorAggregate
      */
     public function hasError()
     {
-        return (bool) $this->_isError;
+        return (bool)$this->_isError;
     }
 
     /**
@@ -716,6 +752,7 @@ abstract class Bronto_Api_Row implements ArrayAccess, IteratorAggregate
         if ($this->hasError()) {
             return $this->_errorCode;
         }
+
         return false;
     }
 
@@ -727,6 +764,7 @@ abstract class Bronto_Api_Row implements ArrayAccess, IteratorAggregate
         if ($this->hasError()) {
             return $this->_errorString;
         }
+
         return false;
     }
 }

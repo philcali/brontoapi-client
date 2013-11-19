@@ -1,15 +1,17 @@
 <?php
 
 /**
- * @author Chris Jones <chris.jones@bronto.com>
+ * @author     Chris Jones <chris.jones@bronto.com>
  * @copyright  2011-2013 Bronto Software, Inc.
- * @license http://opensource.org/licenses/OSL-3.0 Open Software License v. 3.0 (OSL-3.0)
- * 
- * @link http://community.bronto.com/api/v4/objects/general/apitokenobject
+ * @license    http://opensource.org/licenses/OSL-3.0 Open Software License v. 3.0 (OSL-3.0)
  *
- * @method Bronto_Api_ApiToken_Row createRow() createRow(array $data)
+ * @link       http://community.bronto.com/api/v4/objects/general/apitokenobject
+ *
+ * @method \Bronto\Api\ApiToken\Row createRow() createRow(array $data)
  */
-class Bronto_Api_ApiToken extends Bronto_Api_Object
+namespace Bronto\Api;
+
+class ApiToken extends Object
 {
     /** Permissions */
     const PERMISSION_NONE  = 0;
@@ -51,14 +53,15 @@ class Bronto_Api_ApiToken extends Bronto_Api_Object
 
     /**
      * @param array $filter
-     * @param int $pageNumber
-     * @return Bronto_Api_Rowset
+     * @param int   $pageNumber
+     *
+     * @return Rowset
      */
     public function readAll(array $filter = array(), $pageNumber = 1)
     {
-        $params = array();
+        $params               = array();
         $params['filter']     = $filter;
-        $params['pageNumber'] = (int) $pageNumber;
+        $params['pageNumber'] = (int)$pageNumber;
 
         $this->_validateParams($params);
 
@@ -66,13 +69,15 @@ class Bronto_Api_ApiToken extends Bronto_Api_Object
     }
 
     /**
-     * @param  array  $params
+     * @param array $params
+     *
      * @return bool
+     * @throws Exception
      */
     protected function _validateParams(array $params)
     {
         if (!isset($params['filter']) || !is_array($params['filter'])) {
-            throw new Bronto_Api_Exception('readApiTokens requires an filter array.');
+            throw new Exception('readApiTokens requires an filter array.');
         }
 
         $validFilters   = array('id', 'accountId', 'name');
@@ -85,7 +90,7 @@ class Bronto_Api_ApiToken extends Bronto_Api_Object
         }
 
         if (!$hasValidFilter) {
-            throw new Bronto_Api_Exception('readApiTokens requires a filter by one of: ' . implode(', ', $validFilters));
+            throw new Exception('readApiTokens requires a filter by one of: ' . implode(', ', $validFilters));
         }
 
         return true;
@@ -93,33 +98,34 @@ class Bronto_Api_ApiToken extends Bronto_Api_Object
 
     /**
      * @param int $permissions
+     *
      * @return array
      */
     public function getPermissionsLabels($permissions)
     {
         switch ($permissions) {
-            case Bronto_Api_ApiToken::PERMISSION_READ:
+            case self::PERMISSION_READ:
                 return array('read');
                 break;
-            case Bronto_Api_ApiToken::PERMISSION_WRITE:
+            case self::PERMISSION_WRITE:
                 return array('write');
                 break;
-            case Bronto_Api_ApiToken::PERMISSION_SEND:
+            case self::PERMISSION_SEND:
                 return array('send');
                 break;
-            case Bronto_Api_ApiToken::PERMISSIONS_READ_WRITE:
+            case self::PERMISSIONS_READ_WRITE:
                 return array('read', 'write');
                 break;
-            case Bronto_Api_ApiToken::PERMISSIONS_READ_SEND:
+            case self::PERMISSIONS_READ_SEND:
                 return array('read', 'send');
                 break;
-            case Bronto_Api_ApiToken::PERMISSIONS_WRITE_SEND:
+            case self::PERMISSIONS_WRITE_SEND:
                 return array('write', 'send');
                 break;
-            case Bronto_Api_ApiToken::PERMISSIONS_READ_WRITE_SEND:
+            case self::PERMISSIONS_READ_WRITE_SEND:
                 return array('read', 'write', 'send');
                 break;
-            case Bronto_Api_ApiToken::PERMISSION_NONE:
+            case self::PERMISSION_NONE:
                 return array('none');
                 break;
         }

@@ -5,9 +5,9 @@
  * @copyright  2011-2013 Bronto Software, Inc.
  * @license http://opensource.org/licenses/OSL-3.0 Open Software License v. 3.0 (OSL-3.0)
  */
-namespace \Brontoapi\Api;
+namespace Bronto\Api;
 
-class Brontoapi_Api_Exception extends Exception
+class Exception extends \Exception
 {
     const UNKNOWN_ERROR         = 101; // There was an unknown API error. Please try your request again shortly.
     const INVALID_TOKEN         = 102; // Authentication failed for token:

@@ -3,7 +3,9 @@
  * @copyright  2011-2013 Bronto Software, Inc.
  * @license http://opensource.org/licenses/OSL-3.0 Open Software License v. 3.0 (OSL-3.0)
  */
-class Bronto_Api_Delivery_Exception extends Bronto_Api_Exception
+namespace Bronto\Api\Delivery;
+
+class Exception extends \Bronto\Api\Exception
 {
     const INVALID_SEND_DATE                  = 201; // The send date is invalid.
     const INVALID_FROM_ADDRESS               = 202; // The from address is invalid.

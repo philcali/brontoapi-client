@@ -6,7 +6,9 @@
  * @license http://opensource.org/licenses/OSL-3.0 Open Software License v. 3.0 (OSL-3.0)
  * 
  */
-class Bronto_Api_Field_TypeGuesser
+namespace Bronto\Api\Field;
+
+class TypeGuesser
 {
     const DEFAULT_CHOICE       = 'text';
     const CONFIDENCE_THRESHOLD = 70;
@@ -53,9 +55,8 @@ class Bronto_Api_Field_TypeGuesser
     }
 
     /**
-     * @param type $name
      * @param array $values
-     * @param bool $inversed
+     * @param bool  $inversed
      */
     public function processValues(array $values = array(), $inversed = true)
     {
@@ -77,8 +78,7 @@ class Bronto_Api_Field_TypeGuesser
     }
 
     /**
-     * @param text $name
-     * @param mixed $value
+     * @param $value
      */
     protected function processValue($value)
     {

@@ -4,7 +4,9 @@
  * @copyright  2011-2013 Bronto Software, Inc.
  * @license http://opensource.org/licenses/OSL-3.0 Open Software License v. 3.0 (OSL-3.0)
  */
-class Bronto_Api_Message_Exception extends Bronto_Api_Exception
+namespace Bronto\Api\Message;
+
+class Exception extends \Bronto\Api\Exception
 {
     const INVALID_FOLDER_ID        = 601; // The folder id is invalid.
     const INVALID_FOLDER_NAME      = 602; // The folder name is invalid:

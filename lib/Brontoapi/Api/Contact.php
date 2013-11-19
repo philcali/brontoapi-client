@@ -7,9 +7,11 @@
  * 
  * @link http://community.bronto.com/api/v4/objects/general/contactobject
  *
- * @method Bronto_Api_Contact_Row createRow() createRow(array $data)
+ * @method \Bronto\Api\Contact\Row createRow() createRow(array $data)
  */
-class Bronto_Api_Contact extends Bronto_Api_Object
+namespace Bronto\Api;
+
+class Contact extends Object
 {
     /** Status */
     const STATUS_ACTIVE        = 'active';
@@ -75,7 +77,7 @@ class Bronto_Api_Contact extends Bronto_Api_Object
      * @param array $fields
      * @param bool $includeLists
      * @param int $pageNumber
-     * @return Bronto_Api_Rowset
+     * @return Rowset
      */
     public function readAll($filter = array(), $fields = array(), $includeLists = true, $pageNumber = 1)
     {

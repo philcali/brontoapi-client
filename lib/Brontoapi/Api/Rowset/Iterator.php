@@ -6,7 +6,11 @@
  * @license http://opensource.org/licenses/OSL-3.0 Open Software License v. 3.0 (OSL-3.0)
  * 
  */
-class Bronto_Api_Rowset_Iterator implements Iterator, Countable
+namespace Bronto\Api\Rowset;
+
+use \Bronto\Api\Rowset\Exception as Exception;
+
+class Iterator implements \Iterator, \Countable
 {
     /** Iterator Types */
     const TYPE_NONE   = 0;
@@ -17,12 +21,12 @@ class Bronto_Api_Rowset_Iterator implements Iterator, Countable
     /**
      * API Object
      *
-     * @var Bronto_Api_Object
+     * @var \Bronto\Api\Object
      */
     protected $_apiObject;
 
     /**
-     * @var Bronto_Api_Rowset
+     * @var \Bronto\Api\Rowset
      */
     protected $_rowset;
 
@@ -86,14 +90,16 @@ class Bronto_Api_Rowset_Iterator implements Iterator, Countable
     /**
      * Constructor
      *
-     * @param array $config
+     * @param \Bronto\Api\Rowset $rowset
+     *
+     * @throws Exception
      */
-    public function __construct(Bronto_Api_Rowset $rowset)
+    public function __construct(\Bronto\Api\Rowset $rowset)
     {
         $this->_apiObject = $rowset->getApiObject();
 
         if (!$this->_apiObject->canIterate()) {
-            throw new Bronto_Api_Rowset_Exception(sprintf('Cannot iterate results for %s', $this->_apiObject->getName()));
+            throw new Exception(sprintf('Cannot iterate results for %s', $this->_apiObject->getName()));
         }
 
         $this->_type   = $this->_apiObject->getIteratorType();
@@ -106,13 +112,16 @@ class Bronto_Api_Rowset_Iterator implements Iterator, Countable
     }
 
     /**
-     * @return Bronto_Api_Object
+     * @return \Bronto\Api\Object
      */
     public function getApiObject()
     {
         return $this->_apiObject;
     }
 
+    /**
+     * Set up Param Values
+     */
     protected function _setupParamValues()
     {
         $params = $this->_rowset->getParams();
@@ -149,6 +158,8 @@ class Bronto_Api_Rowset_Iterator implements Iterator, Countable
     }
 
     /**
+     * @param array $skipParams
+     *
      * @return array
      */
     protected function _getNextParamValues(array $skipParams = array())
@@ -180,7 +191,8 @@ class Bronto_Api_Rowset_Iterator implements Iterator, Countable
     }
 
     /**
-     * @param int $pad
+     * @param bool $pad
+     *
      * @return int|string
      */
     public function getCurrentPage($pad = false)
@@ -227,7 +239,7 @@ class Bronto_Api_Rowset_Iterator implements Iterator, Countable
      * Similar to the current() function for arrays in PHP
      * Required by interface Iterator.
      *
-     * @return Bronto_Api_Row current element from the collection
+     * @return \Bronto\Api\Row current element from the collection
      */
     public function current()
     {
@@ -235,7 +247,7 @@ class Bronto_Api_Rowset_Iterator implements Iterator, Countable
             return null;
         }
 
-        /* @var $row Bronto_Api_Row */
+        /** @var \Bronto\Api\Row $row */
         $row = $this->_rowset->current();
 
         // Loop through each field we have to update
@@ -299,7 +311,10 @@ class Bronto_Api_Rowset_Iterator implements Iterator, Countable
     }
 
     /**
-     * @return bool
+     * @return mixed
+     * @throws Exception
+     * @throws Exception
+     * @throws \Exception
      */
     protected function _nextRowset()
     {
@@ -329,7 +344,7 @@ class Bronto_Api_Rowset_Iterator implements Iterator, Countable
         }
 
         if (!$this->_rowset) {
-            throw new Bronto_Api_Rowset_Exception('Retrieving the next Rowset failed');
+            throw new Exception('Retrieving the next Rowset failed');
         }
 
         // Increments
@@ -381,7 +396,7 @@ class Bronto_Api_Rowset_Iterator implements Iterator, Countable
     }
 
     /**
-     * @return Bronto_Api
+     * @return \Bronto\Api
      */
     public function getApi()
     {

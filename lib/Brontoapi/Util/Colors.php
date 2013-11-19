@@ -6,7 +6,8 @@
  * @license http://opensource.org/licenses/OSL-3.0 Open Software License v. 3.0 (OSL-3.0)
  * 
  */
-class Bronto_Util_Colors
+namespace Bronto\Util;
+class Colors
 {
     /**
      * @see http://media.if-not-true-then-false.com/2010/01/PHP_CLI_Coloring_Class_Example.png

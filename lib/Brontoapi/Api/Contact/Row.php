@@ -2,38 +2,40 @@
 
 /**
  * @copyright  2011-2013 Bronto Software, Inc.
- * @license http://opensource.org/licenses/OSL-3.0 Open Software License v. 3.0 (OSL-3.0)
- * 
+ * @license    http://opensource.org/licenses/OSL-3.0 Open Software License v. 3.0 (OSL-3.0)
+ *
  * @property-read string $id
- * @property string $email
- * @property string $mobileNumber
- * @property string $status
- * @property string $msgPref
- * @property string $source
- * @property string $customSource
- * @property array $listIds
- * @property array $fields
+ * @property string      $email
+ * @property string      $mobileNumber
+ * @property string      $status
+ * @property string      $msgPref
+ * @property string      $source
+ * @property string      $customSource
+ * @property array       $listIds
+ * @property array       $fields
  * @property-read string $created
- * @property-read string $modifed
- * @property-read bool $deleted
- * @property-read int $numSends
- * @property-read int $numBounces
- * @property-read int $numOpens
- * @property-read int $numClicks
- * @property-read int $numConversions
- * @property-read float $conversionAmount
- * @method Bronto_Api_Contact_Row delete() delete()
- * @method Bronto_Api_Contact getApiObject() getApiObject()
+ * @property-read string $modified
+ * @property-read bool   $deleted
+ * @property-read int    $numSends
+ * @property-read int    $numBounces
+ * @property-read int    $numOpens
+ * @property-read int    $numClicks
+ * @property-read int    $numConversions
+ * @property-read float  $conversionAmount
+ * @method \Bronto\Api\Contact\Row delete() delete()
+ * @method \Bronto\Api\Contact getApiObject() getApiObject()
  */
-class Bronto_Api_Contact_Row extends Bronto_Api_Row implements Bronto_Api_Delivery_Recipient
+namespace Bronto\Api\Contact;
+
+class Row extends \Bronto\Api\Row implements \Bronto\Api\Delivery\Recipient
 {
     /**
      * @var array
      */
     protected $_data = array(
-        'status'          => Bronto_Api_Contact::STATUS_TRANSACTIONAL,
-        'messagePrefence' => Bronto_Api_Contact::MSGPREF_HTML,
-        'source'          => Bronto_Api_Contact::SOURCE_API,
+        'status'          => \Bronto\Api\Contact::STATUS_TRANSACTIONAL,
+        'messagePrefence' => \Bronto\Api\Contact::MSGPREF_HTML,
+        'source'          => \Bronto\Api\Contact::SOURCE_API,
     );
 
     /**
@@ -45,14 +47,15 @@ class Bronto_Api_Contact_Row extends Bronto_Api_Row implements Bronto_Api_Delive
     {
         if (isset($this->_data['fields']) && is_array($this->_data['fields'])) {
             foreach ($this->_data['fields'] as $i => $fieldRow) {
-                $this->_data['fields'][$i] = (array) $fieldRow;
+                $this->_data['fields'][$i] = (array)$fieldRow;
             }
             $this->_cleanData = $this->_data;
         }
     }
 
     /**
-     * @return Bronto_Api_Contact_Row
+     * @return Row
+     * @throws Exception
      */
     public function read()
     {
@@ -67,24 +70,26 @@ class Bronto_Api_Contact_Row extends Bronto_Api_Row implements Bronto_Api_Delive
                 )
             );
         } else {
-            throw new Bronto_Api_Contact_Exception('Trying to read Contact without Id or Email for lookup');
+            throw new Exception('Trying to read Contact without Id or Email for lookup');
         }
 
         parent::_read($params);
+
         return $this;
     }
 
     /**
      * @param bool $upsert
      * @param bool $refresh
-     * @return Bronto_Api_Contact_Row
+     *
+     * @return Row
      */
     public function save($upsert = true, $refresh = false)
     {
         try {
             parent::_save($upsert, $refresh);
         } catch (Bronto_Api_Contact_Exception $e) {
-            if ($e->getCode() === Bronto_Api_Contact_Exception::ALREADY_EXISTS) {
+            if ($e->getCode() === Exception::ALREADY_EXISTS) {
                 $this->_refresh();
             } else {
                 $e->appendToMessage("(Email: {$this->email})");
@@ -96,7 +101,7 @@ class Bronto_Api_Contact_Row extends Bronto_Api_Row implements Bronto_Api_Delive
     }
 
     /**
-     * @return Bronto_Api_Contact_Row
+     * @return Row
      */
     public function persist()
     {
@@ -106,9 +111,10 @@ class Bronto_Api_Contact_Row extends Bronto_Api_Row implements Bronto_Api_Delive
     /**
      * Sets a value for a custom Field
      *
-     * @param string|Bronto_Api_Field_Row $field
-     * @param mixed $value
-     * @return Bronto_Api_Contact_Row
+     * @param string|\Bronto\Api\Field\Row $field
+     * @param mixed                        $value
+     *
+     * @return Row
      */
     public function setField($field, $value)
     {
@@ -117,25 +123,25 @@ class Bronto_Api_Contact_Row extends Bronto_Api_Row implements Bronto_Api_Delive
         }
 
         $fieldId = $field;
-        if ($field instanceOf Bronto_Api_Field_Row) {
+        if ($field instanceOf Row) {
             if (!$field->id) {
                 $field = $field->read();
             }
             $fieldId = $field->id;
 
             switch ($field->type) {
-                case Bronto_Api_Field::TYPE_DATE:
-                    if ($value instanceOf DateTime) {
+                case \Bronto\Api\Field::TYPE_DATE:
+                    if ($value instanceOf \DateTime) {
                         $value = date('c', $value->getTimestamp());
                     } else {
                         $value = date('c', strtotime($value));
                     }
                     break;
-                case Bronto_Api_Field::TYPE_INTEGER:
-                    $value = (int) $value;
+                case \Bronto\Api\Field::TYPE_INTEGER:
+                    $value = (int)$value;
                     break;
-                case Bronto_Api_Field::TYPE_FLOAT:
-                    $value = (float) $value;
+                case \Bronto\Api\Field::TYPE_FLOAT:
+                    $value = (float)$value;
                     break;
             }
         }
@@ -151,29 +157,32 @@ class Bronto_Api_Contact_Row extends Bronto_Api_Row implements Bronto_Api_Delive
             // Check for dupes
             foreach ($this->_data['fields'] as $i => $_field) {
                 if ($_field['fieldId'] == $field['fieldId']) {
-                    $this->_data['fields'][$i] = $field;
+                    $this->_data['fields'][$i]       = $field;
                     $this->_modifiedFields['fields'] = true;
+
                     return $this;
                 }
             }
         }
 
-        $this->_data['fields'][] = $field;
+        $this->_data['fields'][]         = $field;
         $this->_modifiedFields['fields'] = true;
+
         return $this;
     }
 
     /**
-     * Retreives a value for a custom field
+     * Retrieves a value for a custom field
      * NOTE: Loads the field for you if it hasn't been requested
      *
-     * @param string|Bronto_Api_Field_Row $field $field
+     * @param string|\Bronto\Api\Field\Row $field $field
+     *
      * @return mixed
      */
     public function getField($field)
     {
         $fieldId = $field;
-        if ($field instanceOf Bronto_Api_Field_Row) {
+        if ($field instanceOf \Bronto\Api\Field\Row) {
             if (!$field->id) {
                 $field = $field->read();
             }
@@ -200,7 +209,7 @@ class Bronto_Api_Contact_Row extends Bronto_Api_Row implements Bronto_Api_Delive
                                 isset($this->_data['fields']) ? $this->_data['fields'] : array(),
                                 $data['fields']
                             );
-                            $this->_cleanData = $this->_data;
+                            $this->_cleanData      = $this->_data;
                             break;
                         }
                     }
@@ -256,13 +265,14 @@ class Bronto_Api_Contact_Row extends Bronto_Api_Row implements Bronto_Api_Delive
     }
 
     /**
-     * @param Bronto_Api_List_Row|string $list
-     * @return Bronto_Api_Contact_Row
+     * @param \Bronto\Api\MailList\Row|string $list
+     *
+     * @return Row
      */
     public function addToList($list)
     {
         $listId = $list;
-        if ($list instanceOf Bronto_Api_List_Row) {
+        if ($list instanceOf \Bronto\Api\MailList\Row) {
             if (!$list->id) {
                 $list = $list->read();
             }
@@ -274,20 +284,22 @@ class Bronto_Api_Contact_Row extends Bronto_Api_Row implements Bronto_Api_Delive
         }
 
         if (!in_array($listId, $this->_data['listIds'])) {
-            $this->_data['listIds'][] = $listId;
+            $this->_data['listIds'][]         = $listId;
             $this->_modifiedFields['listIds'] = true;
         }
+
         return $this;
     }
 
     /**
-     * @param Bronto_Api_List_Row|string $list
-     * @return Bronto_Api_Contact_Row
+     * @param \Bronto\Api\MailList\Row|string $list
+     *
+     * @return Row
      */
     public function removeFromList($list)
     {
         $listId = $list;
-        if ($list instanceOf Bronto_Api_List_Row) {
+        if ($list instanceOf \Bronto\Api\MailList\Row) {
             if (!$list->id) {
                 $list = $list->read();
             }
@@ -308,6 +320,7 @@ class Bronto_Api_Contact_Row extends Bronto_Api_Row implements Bronto_Api_Delive
         }
 
         $this->_modifiedFields['listIds'] = true;
+
         return $this;
     }
 
@@ -322,15 +335,17 @@ class Bronto_Api_Contact_Row extends Bronto_Api_Row implements Bronto_Api_Delive
 
         $listIds = $this->getLists();
         foreach ($listIds as $listId) {
-            $this->_data['listIds'][] = $listId;
+            $this->_data['listIds'][]         = $listId;
             $this->_modifiedFields['listIds'] = true;
         }
     }
 
     /**
      * @param array $additionalFilter
-     * @param int $pageNumber
-     * @return Bronto_Api_Rowset
+     * @param int   $pageNumber
+     *
+     * @return \Bronto\Api\Rowset
+     * @throws \Bronto\Api\Exception
      */
     public function getDeliveries(array $additionalFilter = array(), $pageNumber = 1)
     {
@@ -339,9 +354,10 @@ class Bronto_Api_Contact_Row extends Bronto_Api_Row implements Bronto_Api_Delive
             throw new $exceptionClass("This Contact has not been retrieved yet (has no ContactId)");
         }
 
-        /* @var $deliveryObject Bronto_Api_Delivery */
+        /* @var $deliveryObject \Bronto\Api\Delivery */
         $deliveryObject = $this->getApi()->getDeliveryObject();
-        $filter = array_merge_recursive(array('contactId' => $this->id), $additionalFilter);
+        $filter         = array_merge_recursive(array('contactId' => $this->id), $additionalFilter);
+
         return $deliveryObject->readDeliveryRecipients($filter, $pageNumber);
     }
 
@@ -368,7 +384,7 @@ class Bronto_Api_Contact_Row extends Bronto_Api_Row implements Bronto_Api_Delive
     }
 
     /**
-     * Required by Bronto_Api_Delivery_Recipient
+     * Required by \Bronto\Api\Delivery\Recipient
      *
      * @return false
      */
@@ -378,7 +394,7 @@ class Bronto_Api_Contact_Row extends Bronto_Api_Row implements Bronto_Api_Delive
     }
 
     /**
-     * Required by Bronto_Api_Delivery_Recipient
+     * Required by \Bronto\Api\Delivery\Recipient
      *
      * @return true
      */
@@ -388,7 +404,7 @@ class Bronto_Api_Contact_Row extends Bronto_Api_Row implements Bronto_Api_Delive
     }
 
     /**
-     * Required by Bronto_Api_Delivery_Recipient
+     * Required by \Bronto\Api\Delivery\Recipient
      *
      * @return false
      */

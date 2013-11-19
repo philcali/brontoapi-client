@@ -5,29 +5,31 @@
  * @copyright  2011-2013 Bronto Software, Inc.
  * @license    http://opensource.org/licenses/OSL-3.0 Open Software License v. 3.0 (OSL-3.0)
  *
- * @link       http://community.bronto.com/api/v4/objects/general/messageruleobject
+ * @link       http://community.bronto.com/api/v4/objects/general/maillistobject
  *
- * @method \Bronto\Api\MessageRule\Row createRow() createRow(array $data = array())
+ * @method \Bronto\Api\MailList\Row createRow() createRow(array $data = array())
  */
 namespace Bronto\Api;
 
-class MessageRule extends Object
+class MailList extends Object
 {
     /**
      * The object name.
      *
      * @var string
      */
-    protected $_name = 'MessageRule';
+    protected $_name = 'MailList';
 
     /**
      * @var array
      */
     protected $_methods = array(
-        'addMessageRules'    => 'add',
-        'readMessageRules'   => 'read',
-        'updateMessageRules' => 'update',
-        'deleteMessageRules' => 'delete',
+        'addLists'    => 'add',
+        'readLists'   => 'read',
+        'updateLists' => 'update',
+        'deleteLists' => 'delete',
+        'addToList'   => true,
+        'clearLists'  => true,
     );
 
     /**
@@ -43,5 +45,19 @@ class MessageRule extends Object
         $params['pageNumber'] = (int)$pageNumber;
 
         return $this->read($params);
+    }
+
+    /**
+     * @param array $data
+     *
+     * @return Rowset
+     */
+    public function clear(array $data = array())
+    {
+        if (array_values($data) !== $data) {
+            $data = array($data);
+        }
+
+        return $this->doRequest('clearLists', $data);
     }
 }

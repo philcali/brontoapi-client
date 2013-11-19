@@ -13,12 +13,14 @@
  * @property array $brandingSettings
  * @property array $repliesSettings
  * @property array $allocations
- * @method Bronto_Api_Account_Row read() read()
- * @method Bronto_Api_Account_Row save() save()
- * @method Bronto_Api_Account_Row delete() delete()
- * @method Bronto_Api_Account getApiObject() getApiObject()
+ * @method \Bronto\Api\Account\Row read() read()
+ * @method \Bronto\Api\Account\Row save() save()
+ * @method \Bronto\Api\Account\Row delete() delete()
+ * @method \Bronto\Api\Account getApiObject() getApiObject()
  */
-class Bronto_Api_Account_Row extends Bronto_Api_Row
+namespace Bronto\Api\Account;
+
+class Row extends \Bronto\Api\Row
 {
 
 }

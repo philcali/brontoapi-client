@@ -6,7 +6,9 @@
  * @license http://opensource.org/licenses/OSL-3.0 Open Software License v. 3.0 (OSL-3.0)
  * 
  */
-class Bronto_Api_Field_Predefined
+namespace Bronto\Api\Field;
+
+class Predefined
 {
     /** Predefined Fields */
     const FIELD_EMAIL          = 'email';
@@ -39,23 +41,23 @@ class Bronto_Api_Field_Predefined
     public static $predefinedFields = array(
         self::FIELD_SALUTATION => array(
             'label' => 'Salutation',
-            'type'  => Bronto_Api_Field::TYPE_TEXT,
+            'type'  => \Bronto\Api\Field::TYPE_TEXT,
         ),
         self::FIELD_FIRSTNAME => array(
             'label' => 'First Name',
-            'type'  => Bronto_Api_Field::TYPE_TEXT,
+            'type'  => \Bronto\Api\Field::TYPE_TEXT,
         ),
         self::FIELD_LASTNAME => array(
             'label' => 'Last Name',
-            'type'  => Bronto_Api_Field::TYPE_TEXT,
+            'type'  => \Bronto\Api\Field::TYPE_TEXT,
         ),
         self::FIELD_AGE => array(
             'label' => 'Age',
-            'type'  => Bronto_Api_Field::TYPE_INTEGER,
+            'type'  => \Bronto\Api\Field::TYPE_INTEGER,
         ),
         self::FIELD_GENDER => array(
             'label'   => 'Gender',
-            'type'    => Bronto_Api_Field::TYPE_RADIO,
+            'type'    => \Bronto\Api\Field::TYPE_RADIO,
             'options' => array(
                 array(
                     'value'     => 'male',
@@ -69,63 +71,63 @@ class Bronto_Api_Field_Predefined
         ),
         self::FIELD_BIRTHDAY => array(
             'label' => 'Birthday',
-            'type'  => Bronto_Api_Field::TYPE_DATE,
+            'type'  => \Bronto\Api\Field::TYPE_DATE,
         ),
         self::FIELD_ADDRESS1 => array(
             'label' => 'Address',
-            'type'  => Bronto_Api_Field::TYPE_TEXT,
+            'type'  => \Bronto\Api\Field::TYPE_TEXT,
         ),
         self::FIELD_ADDRESS2 => array(
             'label' => 'Address (Contd.)',
-            'type'  => Bronto_Api_Field::TYPE_TEXT,
+            'type'  => \Bronto\Api\Field::TYPE_TEXT,
         ),
         self::FIELD_CITY => array(
             'label' => 'City',
-            'type'  => Bronto_Api_Field::TYPE_TEXT,
+            'type'  => \Bronto\Api\Field::TYPE_TEXT,
         ),
         self::FIELD_STATE => array(
             'label' => 'State',
-            'type'  => Bronto_Api_Field::TYPE_TEXT,
+            'type'  => \Bronto\Api\Field::TYPE_TEXT,
         ),
         self::FIELD_STATE_ABBR => array(
             'label' => 'State (Two-Letter Abbreviation)',
-            'type'  => Bronto_Api_Field::TYPE_TEXT,
+            'type'  => \Bronto\Api\Field::TYPE_TEXT,
         ),
         self::FIELD_STATE_ABBR_UC => array(
             'label' => 'State (Uppercase Two-Letter Abbreviation)',
-            'type'  => Bronto_Api_Field::TYPE_TEXT,
+            'type'  => \Bronto\Api\Field::TYPE_TEXT,
         ),
         self::FIELD_STATE_PROVINCE => array(
             'label' => 'State or Province',
-            'type'  => Bronto_Api_Field::TYPE_TEXT,
+            'type'  => \Bronto\Api\Field::TYPE_TEXT,
         ),
         self::FIELD_POSTAL_CODE => array(
             'label' => 'Postal/ZIP Code',
-            'type'  => Bronto_Api_Field::TYPE_TEXT,
+            'type'  => \Bronto\Api\Field::TYPE_TEXT,
         ),
         self::FIELD_COUNTRY => array(
             'label' => 'Country',
-            'type'  => Bronto_Api_Field::TYPE_TEXT,
+            'type'  => \Bronto\Api\Field::TYPE_TEXT,
         ),
         self::FIELD_COUNTRY_CODE => array(
             'label' => 'Country',
-            'type'  => Bronto_Api_Field::TYPE_TEXT,
+            'type'  => \Bronto\Api\Field::TYPE_TEXT,
         ),
         self::FIELD_PHONE_HOME => array(
             'label' => 'Home Phone',
-            'type'  => Bronto_Api_Field::TYPE_TEXT,
+            'type'  => \Bronto\Api\Field::TYPE_TEXT,
         ),
         self::FIELD_PHONE_WORK => array(
             'label' => 'Work Phone',
-            'type'  => Bronto_Api_Field::TYPE_TEXT,
+            'type'  => \Bronto\Api\Field::TYPE_TEXT,
         ),
         self::FIELD_PHONE_MOBILE => array(
             'label' => 'Mobile / Cell Phone',
-            'type'  => Bronto_Api_Field::TYPE_TEXT,
+            'type'  => \Bronto\Api\Field::TYPE_TEXT,
         ),
         self::FIELD_NUM_CHILDREN => array(
             'label'   => 'Number of Children',
-            'type'    => Bronto_Api_Field::TYPE_SELECT,
+            'type'    => \Bronto\Api\Field::TYPE_SELECT,
             'options' => array(
                 array(
                     'value'     => 'None (0)',
@@ -175,7 +177,7 @@ class Bronto_Api_Field_Predefined
         ),
         self::FIELD_EDUCATION => array(
             'label'   => 'Highest Level of Education',
-            'type'    => Bronto_Api_Field::TYPE_SELECT,
+            'type'    => \Bronto\Api\Field::TYPE_SELECT,
             'options' => array(
                 array(
                     'value'     => 'somehighschool',
@@ -205,7 +207,7 @@ class Bronto_Api_Field_Predefined
         ),
         self::FIELD_MARITAL_STATUS => array(
             'label'   => 'Marital Status',
-            'type'    => Bronto_Api_Field::TYPE_SELECT,
+            'type'    => \Bronto\Api\Field::TYPE_SELECT,
             'options' => array(
                 array(
                     'value'     => 'single',

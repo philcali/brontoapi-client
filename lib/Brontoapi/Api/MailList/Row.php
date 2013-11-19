@@ -1,38 +1,42 @@
 <?php
 
 /**
- * 
+ *
  * @copyright  2011-2013 Bronto Software, Inc.
- * @license http://opensource.org/licenses/OSL-3.0 Open Software License v. 3.0 (OSL-3.0)
- * 
+ * @license    http://opensource.org/licenses/OSL-3.0 Open Software License v. 3.0 (OSL-3.0)
+ *
  * @property-read string $id
- * @property string $name
- * @property string $label
- * @property int $activeCount
- * @property string $status
- * @property string $visibility
- * @method Bronto_Api_List_Row delete() delete()
- * @method Bronto_Api_List getApiObject() getApiObject()
+ * @property string      $name
+ * @property string      $label
+ * @property int         $activeCount
+ * @property string      $status
+ * @property string      $visibility
+ * @method \Bronto\Api\MailList\Row delete() delete()
+ * @method \Bronto\Api\MailList getApiObject() getApiObject()
  */
-class Bronto_Api_List_Row extends Bronto_Api_Row implements Bronto_Api_Delivery_Recipient
+namespace Bronto\Api\MailList;
+
+class Row extends \Bronto\Api\Row implements \Bronto\Api\Delivery\Recipient
 {
     /**
      * Retrieves contacts for current list
      *
-     * @param bool $includeLists
+     * @param bool  $includeLists
      * @param array $fields
-     * @param int $pageNumber
-     * @return Bronto_Api_Rowset
+     * @param int   $pageNumber
+     *
+     * @return \Bronto\Api\Rowset
      */
     public function getContacts($includeLists = false, array $fields = array(), $pageNumber = 1)
     {
         $contactObject = $this->getApi()->getContactObject();
-        $filter = array('listId' => $this->id);
+        $filter        = array('listId' => $this->id);
+
         return $contactObject->readAll($filter, $fields, $includeLists, $pageNumber);
     }
 
     /**
-     * @return Bronto_Api_List_Row
+     * @return Row
      */
     public function read()
     {
@@ -48,13 +52,15 @@ class Bronto_Api_List_Row extends Bronto_Api_Row implements Bronto_Api_Delivery_
         }
 
         parent::_read($params);
+
         return $this;
     }
 
     /**
      * @param bool $upsert
      * @param bool $refresh
-     * @return Bronto_Api_List_Row
+     *
+     * @return Row
      */
     public function save($upsert = true, $refresh = false)
     {
@@ -64,8 +70,8 @@ class Bronto_Api_List_Row extends Bronto_Api_Row implements Bronto_Api_Delivery_
 
         try {
             parent::_save(true, $refresh);
-        } catch (Bronto_Api_List_Exception $e) {
-            if ($e->getCode() === Bronto_Api_List_Exception::ALREADY_EXISTS) {
+        } catch (Exception $e) {
+            if ($e->getCode() === Exception::ALREADY_EXISTS) {
                 $this->_refresh();
             } else {
                 $this->getApi()->throwException($e);
@@ -76,7 +82,8 @@ class Bronto_Api_List_Row extends Bronto_Api_Row implements Bronto_Api_Delivery_
     }
 
     /**
-     * @return Bronto_Api_List_Row
+     * @return $this
+     * @throws Exception
      */
     public function clear()
     {
@@ -93,11 +100,12 @@ class Bronto_Api_List_Row extends Bronto_Api_Row implements Bronto_Api_Delivery_
         }
 
         $this->getApiObject()->clear($data);
+
         return $this;
     }
 
     /**
-     * Required by Bronto_Api_Delivery_Recipient
+     * Required by \Bronto\Api\Delivery\Recipient
      *
      * @return true
      */
@@ -107,7 +115,7 @@ class Bronto_Api_List_Row extends Bronto_Api_Row implements Bronto_Api_Delivery_
     }
 
     /**
-     * Required by Bronto_Api_Delivery_Recipient
+     * Required by Bronto\Api\Delivery\Recipient
      *
      * @return false
      */
@@ -117,7 +125,7 @@ class Bronto_Api_List_Row extends Bronto_Api_Row implements Bronto_Api_Delivery_
     }
 
     /**
-     * Required by Bronto_Api_Delivery_Recipient
+     * Required by Bronto\Api\Delivery\Recipient
      *
      * @return false
      */

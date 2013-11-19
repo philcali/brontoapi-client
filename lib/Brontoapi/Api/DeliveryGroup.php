@@ -1,15 +1,17 @@
 <?php
 
 /**
- * @author Chris Jones <chris.jones@bronto.com>
+ * @author     Chris Jones <chris.jones@bronto.com>
  * @copyright  2011-2013 Bronto Software, Inc.
- * @license http://opensource.org/licenses/OSL-3.0 Open Software License v. 3.0 (OSL-3.0)
- * 
- * @link http://community.bronto.com/api/v4/objects/general/deliverygroupobject
+ * @license    http://opensource.org/licenses/OSL-3.0 Open Software License v. 3.0 (OSL-3.0)
  *
- * @method Bronto_Api_DeliveryGroup_Row createRow() createRow(array $data = array())
+ * @link       http://community.bronto.com/api/v4/objects/general/deliverygroupobject
+ *
+ * @method \Bronto\Api\DeliveryGroup\Row createRow() createRow(array $data = array())
  */
-class Bronto_Api_DeliveryGroup extends Bronto_Api_Object
+namespace Bronto\Api;
+
+class DeliveryGroup extends Object
 {
     /** Visibility */
     const VISIBILITY_INTERNAL = 'INTERNAL';
@@ -59,23 +61,26 @@ class Bronto_Api_DeliveryGroup extends Bronto_Api_Object
 
     /**
      * @param array $filter
-     * @param int $pageNumber
-     * @return Bronto_Api_Rowset
+     * @param int   $pageNumber
+     *
+     * @return Rowset
      */
     public function readAll(array $filter = array(), $pageNumber = 1)
     {
-        $params = array();
+        $params               = array();
         $params['filter']     = $filter;
-        $params['pageNumber'] = (int) $pageNumber;
+        $params['pageNumber'] = (int)$pageNumber;
+
         return $this->read($params);
     }
 
     /**
      * @param string $deliveryGroupId
-     * @param array $deliveryIds
-     * @param array $messageIds
-     * @param array $messageRuleIds
-     * @return Bronto_Api_Rowset
+     * @param array  $deliveryIds
+     * @param array  $messageIds
+     * @param array  $messageRuleIds
+     *
+     * @return Rowset
      */
     public function addToDeliveryGroup($deliveryGroupId, array $deliveryIds = array(), array $messageIds = array(), array $messageRuleIds = array())
     {

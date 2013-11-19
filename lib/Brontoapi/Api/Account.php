@@ -7,9 +7,11 @@
  * 
  * @link http://community.bronto.com/api/v4/objects/general/accountobject
  *
- * @method Bronto_Api_Account_Row createRow() createRow(array $data)
+ * @method \Bronto\Api\Account\Row createRow() createRow(array $data)
  */
-class Bronto_Api_Account extends Bronto_Api_Object
+namespace Bronto\Api;
+
+class Account extends Object
 {
     /** Status */
     const STATUS_UNRESTRICTED = 'unrestricted';
@@ -42,7 +44,7 @@ class Bronto_Api_Account extends Bronto_Api_Object
      * @param bool $includeInfo
      * @param string $status
      * @param int $pageNumber
-     * @return Bronto_Api_Rowset
+     * @return Rowset
      */
     public function readAll(array $filter = array(), $includeInfo = true, $status = null, $pageNumber = 1)
     {

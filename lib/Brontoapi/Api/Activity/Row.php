@@ -22,13 +22,15 @@
  * @method bool isSend() isSend()
  * @method bool isUnsubscribe() isUnsubscribe()
  * @method bool isView() isView()
- * @method Bronto_Api_Contact_Row getContact() getContact()
- * @method Bronto_Api_Delivery_Row getDelivery() getDelivery()
- * @method Bronto_Api_Message_Row getMessage() getMessage()
- * @method Bronto_Api_List_Row getList() getList()
- * @method Bronto_Api_Activity getApiObject() getApiObject()
+ * @method \Bronto\Api\Contact\Row getContact() getContact()
+ * @method \Bronto\Api\Delivery\Row getDelivery() getDelivery()
+ * @method \Bronto\Api\Message\Row getMessage() getMessage()
+ * @method \Bronto\Api\MailList\Row getList() getList()
+ * @method \Bronto\Api\Activity getApiObject() getApiObject()
  */
-class Bronto_Api_Activity_Row extends Bronto_Api_Row
+namespace Bronto\Api\Activity;
+
+class Row extends \Bronto\Api\Row
 {
     /**
      * Tracks columns that are dates.
@@ -45,9 +47,11 @@ class Bronto_Api_Activity_Row extends Bronto_Api_Row
     protected $_readOnly = true;
 
     /**
-     * @param string $name
-     * @param array $arguments
-     * @return Bronto_Api_Row
+     * @param $name
+     * @param $arguments
+     *
+     * @return bool|\Bronto\Api\Row
+     * @throws \BadMethodCallException
      */
     public function __call($name, $arguments)
     {
@@ -92,7 +96,7 @@ class Bronto_Api_Activity_Row extends Bronto_Api_Row
             }
         }
 
-        throw new BadMethodCallException("The method {$name} does not exist");
+        throw new \BadMethodCallException("The method {$name} does not exist");
     }
 
     /**
@@ -108,7 +112,7 @@ class Bronto_Api_Activity_Row extends Bronto_Api_Row
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
     public function isHardBounce()
     {
@@ -120,20 +124,23 @@ class Bronto_Api_Activity_Row extends Bronto_Api_Row
     }
 
     /**
-     * @param mixed $upsert
-     * @param mixed $refresh
-     * @throws Bronto_Api_Activity_Exception
+     * @param null $upsert
+     * @param null $refresh
+     *
+     * @return \Bronto\Api\Row|void
+     * @throws Exception
      */
     public function save($upsert = null, $refresh = null)
     {
-        throw new Bronto_Api_Activity_Exception('You cannot create/update an Activity row.');
+        throw new Exception('You cannot create/update an Activity row.');
     }
 
     /**
-     * @throws Bronto_Api_Activity_Exception
+     * @return \Bronto\Api\Row|void
+     * @throws Exception
      */
     public function delete()
     {
-        throw new Bronto_Api_Activity_Exception('You cannot delete an Activity row.');
+        throw new Exception('You cannot delete an Activity row.');
     }
 }

@@ -2,22 +2,24 @@
 
 /**
  * @copyright  2011-2013 Bronto Software, Inc.
- * @license http://opensource.org/licenses/OSL-3.0 Open Software License v. 3.0 (OSL-3.0)
- * 
+ * @license    http://opensource.org/licenses/OSL-3.0 Open Software License v. 3.0 (OSL-3.0)
+ *
  * @property-read string $id
- * @property string $name
- * @property string $visibility
- * @property int $deliveryCount
- * @property string $createdDate
- * @property array $deliveryIds
- * @property array $messageRuleIds
- * @property array $messageIds
- * @method Bronto_Api_DeliveryGroup getApiObject() getApiObject()
+ * @property string      $name
+ * @property string      $visibility
+ * @property int         $deliveryCount
+ * @property string      $createdDate
+ * @property array       $deliveryIds
+ * @property array       $messageRuleIds
+ * @property array       $messageIds
+ * @method \Bronto\Api\DeliveryGroup getApiObject() getApiObject()
  */
-class Bronto_Api_DeliveryGroup_Row extends Bronto_Api_Row
+namespace Bronto\Api\DeliveryGroup;
+
+class Row extends \Bronto\Api\Row
 {
     /**
-     * @return Bronto_Api_DeliveryGroup_Row
+     * @return Row
      */
     public function read()
     {
@@ -33,13 +35,15 @@ class Bronto_Api_DeliveryGroup_Row extends Bronto_Api_Row
         }
 
         parent::_read($params);
+
         return $this;
     }
 
     /**
      * @param bool $upsert
      * @param bool $refresh
-     * @return Bronto_Api_DeliveryGroup_Row
+     *
+     * @return Row
      */
     public function save($upsert = true, $refresh = false)
     {
@@ -49,7 +53,7 @@ class Bronto_Api_DeliveryGroup_Row extends Bronto_Api_Row
 
         try {
             parent::_save(true, $refresh);
-        } catch (Bronto_Api_DeliveryGroup_Exception $e) {
+        } catch (Exception $e) {
             $this->getApi()->throwException($e);
         }
 
