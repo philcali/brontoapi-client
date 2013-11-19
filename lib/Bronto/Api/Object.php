@@ -444,7 +444,7 @@ abstract class Object
     {
         if ($this->_name === null) {
             $className   = get_class($this);
-            $this->_name = str_replace('Bronto_Api_', '', $className);
+            $this->_name = str_replace('\\Bronto\\Api\\', '', $className);
         }
 
         return $this->_name;
@@ -457,7 +457,7 @@ abstract class Object
     {
         if ($this->_rowClass === null) {
             $className = get_class($this);
-            $rowClass  = "{$className}_Row";
+            $rowClass  = "{$className}\\Row";
             if (class_exists($rowClass)) {
                 $this->_rowClass = $rowClass;
             } else {
@@ -475,7 +475,7 @@ abstract class Object
     {
         if ($this->_rowsetClass === null) {
             $className   = get_class($this);
-            $rowsetClass = "{$className}_Rowset";
+            $rowsetClass = "{$className}\\Rowset";
             if (class_exists($rowsetClass, false)) {
                 $this->_rowsetClass = $rowsetClass;
             } else {
@@ -493,7 +493,7 @@ abstract class Object
     {
         if ($this->_exceptionClass === null) {
             $className      = get_class($this);
-            $exceptionClass = "\{$className}\Exception";
+            $exceptionClass = "\\{$className}\\Exception";
             if (class_exists($exceptionClass)) {
                 $this->_exceptionClass = $exceptionClass;
             } else {

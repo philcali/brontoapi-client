@@ -83,24 +83,14 @@ class Api
     /**
      * @param null                          $token
      * @param array                         $options
-     * @param SoapClient                    $soapClient
-     * @param Util\Retryer\RetryerInterface $retryer
-     * @param Util\Uuid                     $uuid
      *
      * @throws Exception
      */
     public function __construct(
         $token = null,
-        array $options = array(),
-        SoapClient $soapClient,
-        Util\Retryer\RetryerInterface $retryer,
-        Util\Uuid $uuid
+        array $options = array()
     )
     {
-        $this->_soapClient = $soapClient;
-        $this->_retryer    = $retryer;
-        $this->_uuid       = $uuid;
-
         if (!extension_loaded('soap')) {
             throw new Exception('SOAP extension is not loaded.');
         }
@@ -409,11 +399,11 @@ class Api
     /**
      * Proxy for intellisense
      *
-     * @return Api\List
+     * @return Api\MailList
      */
     public function getListObject()
     {
-        return $this->getObject('list');
+        return $this->getObject('mailList');
     }
 
     /**
@@ -458,7 +448,7 @@ class Api
         $object = ucfirst($object);
 
         if (!isset($this->_classCache[$object])) {
-            $className = "\Bronto\Api\{$object}";
+            $className = "\\Bronto\\Api\\{$object}";
             if (class_exists($className)) {
                 $this->_classCache[$object] = new $className(array('api' => $this));
             } else {

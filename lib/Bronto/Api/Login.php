@@ -7,9 +7,11 @@
  * 
  * @link http://community.bronto.com/api/v4/objects/general/accountobject
  *
- * @method Bronto_Api_Login_Row createRow() createRow(array $data)
+ * @method \Bronto\Api\Login\Row createRow() createRow(array $data)
  */
-class Bronto_Api_Login extends Bronto_Api_Object
+namespace Bronto\Api;
+
+class Login extends Object
 {
     /**
      * @var array
@@ -24,7 +26,7 @@ class Bronto_Api_Login extends Bronto_Api_Object
     /**
      * @param array $filter
      * @param int $pageNumber
-     * @return Bronto_Api_Rowset
+     * @return Rowset
      */
     public function readAll(array $filter = array(), $pageNumber = 1)
     {
